@@ -1,11 +1,47 @@
 package ru.kotlin566.messenger.client
 
+import okhttp3.FormBody
 import ru.kotlin566.messenger.server.*
+import okhttp3.OkHttpClient
+import okhttp3.Request
+import okhttp3.RequestBody
+import java.io.IOException
+import org.springframework.security.crypto.keygen.KeyGenerators.string
+import com.sun.corba.se.spi.presentation.rmi.StubAdapter.request
+
+
 
 /**
  * Клиент мессенджера
  */
 class MessengerClient(private val server: MessengerServer) {
+
+    val PATH: String = "http://127.0.0.1:9999"                 //TODO: it's a local address
+    val client = OkHttpClient()
+
+    fun checkAlive() {
+//        val formBody: RequestBody = FormBody.Builder()
+//                .add("message", "Your message")
+//                .build()
+        val request = Request.Builder()
+                .url("$PATH/v1/health")
+                .get()
+                .build()
+        try {
+            val response = client.newCall(request).execute()
+
+            val serverAnswer = response.body().string()
+
+            if (serverAnswer == null) {
+                println("Bad health, test answer is null.")
+            }
+            println(serverAnswer.toString())
+
+
+        } catch (e: IOException) {
+            e.printStackTrace()
+        }
+    }
 
     fun register(login: String, name: String, password: String) {
         server.usersCreate(login, name, password)
@@ -36,7 +72,7 @@ class MessengerClient(private val server: MessengerServer) {
         return server.chatsCreate(chatName, userId, token)
     }
 
-    fun chatsJoin(chatId: Int, secret: String, userId: String, token: String, chatName: String? = null)  {
+    fun chatsJoin(chatId: Int, secret: String, userId: String, token: String, chatName: String? = null) {
         server.chatsJoin(chatId, secret, userId, token, chatName)
     }
 
@@ -57,6 +93,6 @@ class MessengerClient(private val server: MessengerServer) {
     }
 }
 
-open class ClientAware (val client: MessengerClient)
-open class UserAware (val user: User) : ClientAware(user.client)
-open class ChatAware (chat: Chat) : UserAware(chat.user)
+open class ClientAware(val client: MessengerClient)
+open class UserAware(val user: User) : ClientAware(user.client)
+open class ChatAware(chat: Chat) : UserAware(chat.user)

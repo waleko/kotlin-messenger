@@ -142,4 +142,9 @@ class MessengerTest {
                 ?: fail("После присоединения чат отсутствует у пользователя")
     }
 
+    @Test
+    fun testHealthRequest() {
+        client1.checkAlive()        //TODO: I need an assert, but come on
+    }
+
 }

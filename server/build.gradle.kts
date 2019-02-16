@@ -18,12 +18,14 @@ val kotlinVersion : String by project
 val ktorVersion : String by project
 val logbackVersion: String by project
 val springSecurityVersion: String by project
+val okHttpVersion: String = "3.0.1"         //TODO: replace with "by project"
 
 dependencies {
     compile ("org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlinVersion")
     compile ("io.ktor:ktor-server-netty:$ktorVersion")
     compile ("io.ktor:ktor-server-core:$ktorVersion")
     compile ("io.ktor:ktor-auth:$ktorVersion")
+    compile ("com.squareup.okhttp3:okhttp:$okHttpVersion")
     compile ("io.ktor:ktor-auth-jwt:$ktorVersion")
     compile ("io.ktor:ktor-jackson:$ktorVersion")
     compile ("ch.qos.logback:logback-classic:$logbackVersion")
