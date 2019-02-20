@@ -12,12 +12,17 @@ import com.fasterxml.jackson.module.kotlin.readValue
 import org.junit.Assert.assertTrue
 import ru.kotlin566.messenger.server.NewUserInfo
 import ru.kotlin566.messenger.server.PasswordInfo
+import ru.kotlin566.messenger.server.UserInfo
 import ru.kotlin566.messenger.server.module
 import kotlin.test.assertNotNull
 
 class ApplicationTest {
 
     private val objectMapper = jacksonObjectMapper()
+
+    private val testUser1 = NewUserInfo("teapot1", "Teapot1", "i_am_a_teapot")
+    private val testUser2 = NewUserInfo("teapot2", "Teapot2", "i_am_a_teapot")
+    private val testUser3 = NewUserInfo("teapot3", "Teapot3", "i_am_a_teapot")
 
     @Test
     fun testHealth() {
@@ -31,20 +36,13 @@ class ApplicationTest {
 
     data class ClientUserInfo(val userId: String, val displayName: String)
 
-    @Test
-    fun testUserCreation_UserAlreadyExists(){
-
-    }
-
-    @Test
-    fun `testLogin&Logout`() {
-
-    }
+    private val testUserCreation_data = listOf (
+            testUser1,
+            testUser2,
+            testUser3)
 
     @Test
     fun testUserCreation() {
-        // TODO add separate login and logout test function
-        val userData = NewUserInfo("pupkin", "Pupkin", "password")
         withTestApplication({ module() }) {
 
             // Register
@@ -52,19 +50,19 @@ class ApplicationTest {
                 method = HttpMethod.Post
                 uri = "/v1/users"
                 addHeader("Content-type", "application/json")
-                setBody(objectMapper.writeValueAsString(userData))
+                setBody(objectMapper.writeValueAsString(testUser1))
             }.apply {
                 assertEquals(HttpStatusCode.OK, response.status())
                 val user = objectMapper.readValue<ClientUserInfo>(response.content!!)
-                assertEquals(userData.userId, user.userId)
-                assertEquals(userData.displayName, user.displayName)
+                assertEquals(testUser1.userId, user.userId)
+                assertEquals(testUser1.displayName, user.displayName)
 
                 // Login
                 handleRequest {
                     method = HttpMethod.Post
-                    uri = "/v1/users/pupkin/singin"
+                    uri = """/v1/users/${testUser1.userId}/singin"""
                     addHeader("Content-type", "application/json")
-                    setBody(objectMapper.writeValueAsString(PasswordInfo("password")))
+                    setBody(objectMapper.writeValueAsString(PasswordInfo(testUser1.password)))
                 }.apply {
                     assertEquals(HttpStatusCode.OK, response.status())
                     val tokenInfo = objectMapper.readValue<HashMap<String, String>>(response.content!!)
@@ -76,7 +74,7 @@ class ApplicationTest {
                     // Logout
                     handleRequest {
                         method = HttpMethod.Post
-                        uri = "/v1/me/singout?_user_id=pupkin&_token=$token"
+                        uri = "/v1/me/singout?_user_id=${testUser1.displayName}&_token=$token"
                     }.apply {
                         assertEquals(HttpStatusCode.OK, response.status())
                     }
