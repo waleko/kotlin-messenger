@@ -101,4 +101,6 @@ class ApplicationTest {
     // TODO invite normal person with wrong auth to chat, invite non-existing person to non-existing chat, invite normal person with wrong auth to chat with wrong secret.
 
     // TODO testChatsLeave: remove normal person from chat, remove non-joined person, remove non-existing person, remove person from not their chat,
+
+    // TODO: test branches
 }
