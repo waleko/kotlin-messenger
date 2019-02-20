@@ -32,7 +32,18 @@ class ApplicationTest {
     data class ClientUserInfo(val userId: String, val displayName: String)
 
     @Test
+    fun testUserCreation_UserAlreadyExists(){
+
+    }
+
+    @Test
+    fun `testLogin&Logout`() {
+
+    }
+
+    @Test
     fun testUserCreation() {
+        // TODO add separate login and logout test function
         val userData = NewUserInfo("pupkin", "Pupkin", "password")
         withTestApplication({ module() }) {
 
@@ -56,7 +67,7 @@ class ApplicationTest {
                     setBody(objectMapper.writeValueAsString(PasswordInfo("password")))
                 }.apply {
                     assertEquals(HttpStatusCode.OK, response.status())
-                    val tokenInfo = objectMapper.readValue<HashMap<String,String>>(response.content!!)
+                    val tokenInfo = objectMapper.readValue<HashMap<String, String>>(response.content!!)
                     val token = tokenInfo["token"]
                     assertNotNull(token)
                     assertTrue(token.length == 36)
@@ -73,4 +84,21 @@ class ApplicationTest {
             }
         }
     }
+
+    // TODO testUsersListById: my user, other user, non-existing user, you are non-existing user, wrong auth token.
+
+    // TODO testUsersListByName: my user, other user, non-existing user, you are non-existing user, wrong auth token.
+
+    // TODO testDeleteUser: delete user, delete non-existing user, delete with using wrong auth.
+
+    // TODO testChatsCreate: create normal chat, create existing chat, create with non-existing user, create with bad auth.
+
+    // TODO testUsersInviteToChat: invite normal person, invite yourself, invite already invited person, invite non-existing person,
+    // TODO invite normal with bad auth, invite kicked person.
+
+    // TODO testChatsJoin: invite normal person to existing chat, invite already joined person to a chat,
+    // TODO invite normal person to non-existing chat, invite non-existing person to chat, invite normal person to chat with wrong secret,
+    // TODO invite normal person with wrong auth to chat, invite non-existing person to non-existing chat, invite normal person with wrong auth to chat with wrong secret.
+
+    // TODO testChatsLeave: remove normal person from chat, remove non-joined person, remove non-existing person, remove person from not their chat,
 }
