@@ -18,6 +18,7 @@ dependencies {
     compile ("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
     compile ("org.jetbrains.kotlin:kotlin-reflect")
     compile ("org.springframework.security:spring-security-config:$springSecurityVersion")
+    compile ("com.beust:klaxon:5.0.1")
 
     testImplementation ("org.junit.jupiter:junit-jupiter-api:$junitVersion")
     testRuntimeOnly ("org.junit.jupiter:junit-jupiter-engine:$junitVersion")

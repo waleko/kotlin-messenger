@@ -145,6 +145,7 @@ class MessengerTest {
     @Test
     fun testHealthRequest() {
         client1.checkAlive()        //TODO: I need an assert, but come on
+        client1.register("MARK", "Mark", "12345678")
     }
 
 }
