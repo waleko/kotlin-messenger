@@ -100,5 +100,25 @@ class ApplicationTest {
     // TODO invite normal person to non-existing chat, invite non-existing person to chat, invite normal person to chat with wrong secret,
     // TODO invite normal person with wrong auth to chat, invite non-existing person to non-existing chat, invite normal person with wrong auth to chat with wrong secret.
 
-    // TODO testChatsLeave: remove normal person from chat, remove non-joined person, remove non-existing person, remove person from not their chat,
+    // TODO testChatsLeave: remove normal person from chat, remove non-joined person, remove non-existing person,
+    // TODO remove person from their chat with wrong auth, remove non-existing person from non-existing chat.
+
+    // TODO testUsersListChats: list from normal person, list from bad auth, list from non-existing person.
+
+    // TODO testChatsMembersList: list of normal person from chat, list of non-joined person, list of non-existing person,
+    // TODO list of person from their chat with wrong auth, list of non-existing person from non-existing chat.
+
+    // TODO testChatMessagesCreate: from normal to normal, from not joined to normal, from normal to non-existing,
+    // TODO from non-existing to normal, from normal to normal bad auth, from normal to non-existing bad auth,
+    // TODO normal to normal + empty message, normal to normal + giant and very bad message.
+
+    // TODO testChatMessagesList: normal of normal + check with message creation, non-joined to normal, non-existing to normal, normal to normal bad auth,
+    // TODO normal to non-existing, non-existing to non-existing, normal to normal afterId < 0.
+
+    // TODO testChatMessagesDeleteById: delete normal of normal + check with chatMessagesList(), delete non-existing message from normal,
+    // TODO delete normal from non-existing chat, delete normal from not-joined chat by user, delete normal from non-existing user.
+
+    // TODO testCheckUserAuthorization: normal, bad auth, non-existing.
+
+    // TODO testGetSystemUserId: normal.
 }
