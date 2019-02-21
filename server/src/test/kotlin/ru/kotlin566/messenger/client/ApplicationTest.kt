@@ -20,7 +20,7 @@ class ApplicationTest {
 
     private val objectMapper = jacksonObjectMapper()
 
-    private val testUser1 = NewUserInfo("teapot1", "Teapot1", "i_am_a_teapot")
+    private val testUser1 = NewUserInfo("pupkin", "Pupkin", "password")
     private val testUser2 = NewUserInfo("teapot2", "Teapot2", "i_am_a_teapot")
     private val testUser3 = NewUserInfo("teapot3", "Teapot3", "i_am_a_teapot")
 
@@ -74,7 +74,7 @@ class ApplicationTest {
                     // Logout
                     handleRequest {
                         method = HttpMethod.Post
-                        uri = "/v1/me/singout?_user_id=${testUser1.displayName}&_token=$token"
+                        uri = "/v1/me/singout?_user_id=${testUser1.userId}&_token=$token"
                     }.apply {
                         assertEquals(HttpStatusCode.OK, response.status())
                     }
