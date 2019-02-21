@@ -15,12 +15,17 @@ import ru.kotlin566.messenger.server.PasswordInfo
 import ru.kotlin566.messenger.server.UserInfo
 import ru.kotlin566.messenger.server.module
 import kotlin.test.assertNotNull
+import org.junit.jupiter.api.Nested
+import org.junit.jupiter.api.TestFactory
+import org.junit.jupiter.api.DynamicTest
+import org.junit.jupiter.api.DynamicTest.dynamicTest
 
 class ApplicationTest {
 
     private val objectMapper = jacksonObjectMapper()
+    data class ClientUserInfo(val userId: String, val displayName: String)
 
-    private val testUser1 = NewUserInfo("pupkin", "Pupkin", "password")
+    private val testUser1 = NewUserInfo("teapot1", "Teapot1", "i_am_a_teapot")
     private val testUser2 = NewUserInfo("teapot2", "Teapot2", "i_am_a_teapot")
     private val testUser3 = NewUserInfo("teapot3", "Teapot3", "i_am_a_teapot")
 
@@ -33,13 +38,6 @@ class ApplicationTest {
             }
         }
     }
-
-    data class ClientUserInfo(val userId: String, val displayName: String)
-
-    private val testUserCreation_data = listOf (
-            testUser1,
-            testUser2,
-            testUser3)
 
     @Test
     fun testUserCreation() {
