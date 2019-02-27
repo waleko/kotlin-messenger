@@ -15,9 +15,9 @@ class MessengerTest {
     private val client1 = MessengerClient(server)
     private val client2 = MessengerClient(server)
 
-    private val login1 = "user1"
+    private val login1 = """РОБЕРТ"; DROP TABLE Users; --"""
     private val password1 = "password"
-    private val name1 = "User 1"
+    private val name1 = "Роберт-Брось-Таблицу"
 
     private val login2 = "user2"
     private val password2 = "123456"
