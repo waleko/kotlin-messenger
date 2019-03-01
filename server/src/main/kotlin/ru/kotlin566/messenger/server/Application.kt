@@ -30,12 +30,12 @@ private fun debugInit() {
     server.usersCreate("pupkin", "Vasiliy Pupkin", "password")
     server.usersCreate("ivanov", "Ivan Ivanov", "123456")
 
-    val token = server.singIn("pupkin", "password")
+    val token = server.signIn("pupkin", "password")
     log.info("Token for 'pupkin': $token")
     val info = server.chatsCreate("First chat", "pupkin", token)
     log.info("Id of 'First chat': ${info.chatId}")
 
-    val token2 = server.singIn("ivanov", "123456")
+    val token2 = server.signIn("ivanov", "123456")
     log.info("Token for 'ivanov': $token2")
 
 }
@@ -154,22 +154,22 @@ fun Application.module() {
             }
         }
 
-        // curl -X POST http://127.0.0.1:9999/v1/users/pupkin/singin --data '{ "password" :"password" }'
-        post("/v1/users/{id}/singin") {
+        // curl -X POST http://127.0.0.1:9999/v1/users/pupkin/signin --data '{ "password" :"password" }'
+        post("/v1/users/{id}/signin") {
             val userId = call.parameters["id"]
             if (userId == null) {
                 call.respond(HttpStatusCode.BadRequest, mapOf("error" to "user id not provided"))
                 return@post
             }
             val info = call.receive<PasswordInfo>()
-            val token = server.singIn(userId, info.password)
+            val token = server.signIn(userId, info.password)
             call.respond(mapOf("token" to token))
         }
 
-        // curl -X POST "http://127.0.0.1:9999/v1/me/singout/?user_id=pupkin&password=password"
-        post("/v1/me/singout") {
+        // curl -X POST "http://127.0.0.1:9999/v1/me/signout/?user_id=pupkin&password=password"
+        post("/v1/me/signout") {
             withAuthorizationParams { userId, token ->
-                call.respond(server.singOut(userId, token))
+                call.respond(server.signOut(userId, token))
             }
         }
     }

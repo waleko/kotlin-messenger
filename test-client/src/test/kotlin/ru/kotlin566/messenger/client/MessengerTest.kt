@@ -37,11 +37,11 @@ class MessengerTest {
         client2.register(login2, name2, password2)
 
         // Авторизуемся под первым пользователем и проверяем правильность информации о нём
-        val user1 = client1.singIn(login1, password1)
+        val user1 = client1.signIn(login1, password1)
         assertEquals(name1, user1.name)
 
         // Авторизуемся под вторым пользователем и проверяем правильность информации о нём
-        val user2 = client2.singIn(login2, password2)
+        val user2 = client2.signIn(login2, password2)
         assertEquals(name2, user2.name)
 
         // Первый пользователь создаёт чат и приглашает в него второго пользователя
@@ -102,8 +102,8 @@ class MessengerTest {
     fun testRefreshSpeed() {
         client1.register(login1, name1, password1)
         client2.register(login2, name2, password2)
-        val user1 = client1.singIn(login1, password1)
-        val user2 = client2.singIn(login2, password2)
+        val user1 = client1.signIn(login1, password1)
+        val user2 = client2.signIn(login2, password2)
 
         val user1chat = user1.createChat(name2)
         user1chat.inviteUser(user2.userId)

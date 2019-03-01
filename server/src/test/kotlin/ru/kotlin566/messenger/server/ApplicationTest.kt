@@ -21,7 +21,7 @@ class ApplicationTest {
 
     internal fun getTokenOfNewUser(user: NewUserInfo) : String {
         myServer.usersCreate(user.userId, user.displayName, user.password)
-        val token = myServer.singIn(user.userId, user.password)
+        val token = myServer.signIn(user.userId, user.password)
         assertNotNull(token)
         return token
     }
@@ -128,11 +128,11 @@ class ApplicationTest {
             val userInfo = myServer.usersCreate(user.userId, user.displayName, user.password)
             assertEquals(user.displayName, userInfo.displayName)
             assertEquals(user.userId, userInfo.userId)
-            val token = myServer.singIn(user.userId, user.password)
+            val token = myServer.signIn(user.userId, user.password)
             assertNotNull(token)
             val gotUserInfo = myServer.checkUserAuthorization(user.userId, token)
             assertSame(userInfo, gotUserInfo)
-            myServer.singOut(user.userId, token)
+            myServer.signOut(user.userId, token)
             assertThrows(UserNotAuthorizedException::class.java) {myServer.checkUserAuthorization(user.userId, token)}
         }
 
@@ -142,7 +142,7 @@ class ApplicationTest {
             val userInfo = myServer.usersCreate(user.userId, user.displayName, user.password)
             assertEquals(user.displayName, userInfo.displayName)
             assertEquals(user.userId, userInfo.userId)
-            assertThrows(UserNotAuthorizedException::class.java) {myServer.singIn(user.userId, user.password + "_and_i_like_tea")}
+            assertThrows(UserNotAuthorizedException::class.java) {myServer.signIn(user.userId, user.password + "_and_i_like_tea")}
         }
 
         @Test
@@ -151,11 +151,11 @@ class ApplicationTest {
             val userInfo = myServer.usersCreate(user.userId, user.displayName, user.password)
             assertEquals(user.displayName, userInfo.displayName)
             assertEquals(user.userId, userInfo.userId)
-            val token = myServer.singIn(user.userId, user.password)
+            val token = myServer.signIn(user.userId, user.password)
             assertNotNull(token)
             val gotUserInfo = myServer.checkUserAuthorization(user.userId, token)
             assertSame(userInfo, gotUserInfo)
-            assertThrows(UserNotAuthorizedException::class.java) {myServer.singOut(user.userId, token + "qwerty")}
+            assertThrows(UserNotAuthorizedException::class.java) {myServer.signOut(user.userId, token + "qwerty")}
         }
 
         @Test
@@ -164,7 +164,7 @@ class ApplicationTest {
             val userInfo = myServer.usersCreate(user.userId, user.displayName, user.password)
             assertEquals(user.displayName, userInfo.displayName)
             assertEquals(user.userId, userInfo.userId)
-            assertThrows(NoSuchElementException::class.java) {myServer.singIn(user.userId + "_qwerty鷗", user.password)}
+            assertThrows(NoSuchElementException::class.java) {myServer.signIn(user.userId + "_qwerty鷗", user.password)}
         }
 
         @Test
@@ -173,11 +173,11 @@ class ApplicationTest {
             val userInfo = myServer.usersCreate(user.userId, user.displayName, user.password)
             assertEquals(user.displayName, userInfo.displayName)
             assertEquals(user.userId, userInfo.userId)
-            val token = myServer.singIn(user.userId, user.password)
+            val token = myServer.signIn(user.userId, user.password)
             assertNotNull(token)
             val gotUserInfo = myServer.checkUserAuthorization(user.userId, token)
             assertSame(userInfo, gotUserInfo)
-            assertThrows(NoSuchElementException::class.java) {myServer.singOut(user.userId + "_1qwerty鷗", token)}
+            assertThrows(NoSuchElementException::class.java) {myServer.signOut(user.userId + "_1qwerty鷗", token)}
         }
     }
 
@@ -187,7 +187,7 @@ class ApplicationTest {
         fun testNormalYourself() {
             val user = newDummy()
             val userInfo = myServer.usersCreate(user.userId, user.displayName, user.password)
-            val token = myServer.singIn(user.userId, user.password)
+            val token = myServer.signIn(user.userId, user.password)
             assertNotNull(token)
             val list = myServer.usersListById(user.userId, user.userId, token)
             assertEquals(1, list.size)
@@ -202,7 +202,7 @@ class ApplicationTest {
             val user = NewUserInfo("teapot10", "Teapot", "i_am_a_teapot")
             val userInfo = myServer.usersCreate(user.userId, user.displayName, user.password)
 
-            val token = myServer.singIn(myUser.userId, myUser.password)
+            val token = myServer.signIn(myUser.userId, myUser.password)
             assertNotNull(token)
             val list = myServer.usersListById(user.userId, myUser.userId, token)
             assertEquals(1, list.size)
@@ -213,7 +213,7 @@ class ApplicationTest {
         fun testNonExistingAnother() {
             val myUser = NewUserInfo("teapot11", "Teapot", "i_am_a_teapot")
             myServer.usersCreate(myUser.userId, myUser.displayName, myUser.password)
-            val token = myServer.singIn(myUser.userId, myUser.password)
+            val token = myServer.signIn(myUser.userId, myUser.password)
             assertNotNull(token)
             assertThrows(NoSuchElementException::class.java) {myServer.usersListById(myUser.userId + "_qwerty鷗", myUser.userId, token)}
         }
@@ -222,7 +222,7 @@ class ApplicationTest {
         fun testNonExistingYou() {
             val user = NewUserInfo("teapot12", "Teapot", "i_am_a_teapot")
             myServer.usersCreate(user.userId, user.displayName, user.password)
-            val token = myServer.singIn(user.userId, user.password)
+            val token = myServer.signIn(user.userId, user.password)
             assertNotNull(token)
             assertThrows(NoSuchElementException::class.java) {myServer.usersListById(user.userId, user.userId + "_qwerty鷗", token)}
         }
@@ -231,7 +231,7 @@ class ApplicationTest {
         fun testWrongToken() {
             val user = NewUserInfo("teapot13", "Teapot", "i_am_a_teapot")
             myServer.usersCreate(user.userId, user.displayName, user.password)
-            val token = myServer.singIn(user.userId, user.password)
+            val token = myServer.signIn(user.userId, user.password)
             assertNotNull(token)
             assertThrows(UserNotAuthorizedException::class.java) {myServer.usersListById(user.userId, user.userId, token + "qwerty")}
         }
@@ -243,7 +243,7 @@ class ApplicationTest {
         fun testNormal() {
             val user = NewUserInfo("teapot14", "Teapot_qwerty鷗_randomhaha\uD83C\uDFF30\uD83C\uDF08", "i_am_a_teapot")
             val userInfo = myServer.usersCreate(user.userId, user.displayName, user.password)
-            val token = myServer.singIn(user.userId, user.password)
+            val token = myServer.signIn(user.userId, user.password)
             assertNotNull(token)
             val list = myServer.usersListByName(user.displayName, user.userId, token)
             assertEquals(1, list.size)
@@ -261,7 +261,7 @@ class ApplicationTest {
         fun testNonExistingAnother() {
             val myUser = NewUserInfo("teapot16", "Teapot", "i_am_a_teapot")
             myServer.usersCreate(myUser.userId, myUser.displayName, myUser.password)
-            val token = myServer.singIn(myUser.userId, myUser.password)
+            val token = myServer.signIn(myUser.userId, myUser.password)
             assertNotNull(token)
             val list = myServer.usersListByName(myUser.displayName + "_qwerty鷗", myUser.userId, token)
             assertEquals(0, list.size)
@@ -271,7 +271,7 @@ class ApplicationTest {
         fun testNonExistingYou() {
             val user = NewUserInfo("teapot17", "Teapot", "i_am_a_teapot")
             myServer.usersCreate(user.userId, user.displayName, user.password)
-            val token = myServer.singIn(user.userId, user.password)
+            val token = myServer.signIn(user.userId, user.password)
             assertNotNull(token)
             assertThrows(NoSuchElementException::class.java) {myServer.usersListById(user.displayName, user.userId + "_qwerty鷗", token)}
         }
@@ -280,7 +280,7 @@ class ApplicationTest {
         fun testWrongToken() {
             val user = NewUserInfo("teapot18", "Teapot", "i_am_a_teapot")
             myServer.usersCreate(user.userId, user.displayName, user.password)
-            val token = myServer.singIn(user.userId, user.password)
+            val token = myServer.signIn(user.userId, user.password)
             assertNotNull(token)
             assertThrows(UserNotAuthorizedException::class.java) {myServer.usersListById(user.displayName, user.userId, token + "qwerty")}
         }
@@ -294,7 +294,7 @@ class ApplicationTest {
         fun testNormal() {
             val user = NewUserInfo("teapot19", "Teapot", "i_am_a_teapot")
             myServer.usersCreate(user.userId, user.displayName, user.password)
-            val token = myServer.singIn(user.userId, user.password)
+            val token = myServer.signIn(user.userId, user.password)
             assertNotNull(token)
             val chatId = myServer.chatsCreate("Tea Party", user.userId, token)
             assertNotNull(chatId)
@@ -306,7 +306,7 @@ class ApplicationTest {
         fun testNonExisting() {
             val myUser = NewUserInfo("teapot20", "Teapot", "i_am_a_teapot")
             myServer.usersCreate(myUser.userId, myUser.displayName, myUser.password)
-            val token = myServer.singIn(myUser.userId, myUser.password)
+            val token = myServer.signIn(myUser.userId, myUser.password)
             assertNotNull(token)
             assertThrows(NoSuchElementException::class.java) {myServer.chatsCreate("Tea Party", myUser.userId + "_qwerty鷗", token)}
         }
@@ -315,7 +315,7 @@ class ApplicationTest {
         fun testWrongToken() {
             val myUser = NewUserInfo("teapot21", "Teapot", "i_am_a_teapot")
             myServer.usersCreate(myUser.userId, myUser.displayName, myUser.password)
-            val token = myServer.singIn(myUser.userId, myUser.password)
+            val token = myServer.signIn(myUser.userId, myUser.password)
             assertNotNull(token)
             assertThrows(UserNotAuthorizedException::class.java) {myServer.chatsCreate("Tea Party", myUser.userId, token + "_qwerty鷗")}
         }
@@ -328,7 +328,7 @@ class ApplicationTest {
             // Create init user and chat
             val user = NewUserInfo("teapot22", "Teapot", "i_am_a_teapot")
             myServer.usersCreate(user.userId, user.displayName, user.password)
-            val token = myServer.singIn(user.userId, user.password)
+            val token = myServer.signIn(user.userId, user.password)
             assertNotNull(token)
 
             val chatId = myServer.chatsCreate("Tea Party", user.userId, token)
@@ -339,7 +339,7 @@ class ApplicationTest {
             // Create user, who will be invited
             val invUser = NewUserInfo("teapot23", "Teapot", "i_am_a_teapot")
             myServer.usersCreate(invUser.userId, invUser.displayName, invUser.password)
-            val invToken = myServer.singIn(invUser.userId, invUser.password)
+            val invToken = myServer.signIn(invUser.userId, invUser.password)
 
             // Invite
             myServer.usersInviteToChat(invUser.userId, chatId.chatId, user.userId, token)
@@ -365,7 +365,7 @@ class ApplicationTest {
             // Create init user and chat
             val user = NewUserInfo("teapot24", "Teapot", "i_am_a_teapot")
             myServer.usersCreate(user.userId, user.displayName, user.password)
-            val token = myServer.singIn(user.userId, user.password)
+            val token = myServer.signIn(user.userId, user.password)
             assertNotNull(token)
             val chatId = myServer.chatsCreate("Tea Party", user.userId, token)
             assertNotNull(chatId)
@@ -375,7 +375,7 @@ class ApplicationTest {
             // Create user, who will be invited
             val invUser = NewUserInfo("teapot25", "Teapot", "i_am_a_teapot")
             myServer.usersCreate(invUser.userId, invUser.displayName, invUser.password)
-            val invToken = myServer.singIn(invUser.userId, invUser.password)
+            val invToken = myServer.signIn(invUser.userId, invUser.password)
 
             // Invite twice
             myServer.usersInviteToChat(invUser.userId, chatId.chatId, user.userId, token)
@@ -403,7 +403,7 @@ class ApplicationTest {
             // Create init user and chat
             val user = NewUserInfo("teapot26", "Teapot", "i_am_a_teapot")
             myServer.usersCreate(user.userId, user.displayName, user.password)
-            val token = myServer.singIn(user.userId, user.password)
+            val token = myServer.signIn(user.userId, user.password)
             assertNotNull(token)
             val chatId = myServer.chatsCreate("Tea Party", user.userId, token)
             assertNotNull(chatId)
@@ -417,7 +417,7 @@ class ApplicationTest {
             // Create init user and chat
             val user = NewUserInfo("teapot27", "Teapot", "i_am_a_teapot")
             myServer.usersCreate(user.userId, user.displayName, user.password)
-            val token = myServer.singIn(user.userId, user.password)
+            val token = myServer.signIn(user.userId, user.password)
             assertNotNull(token)
             val chatId = myServer.chatsCreate("Tea Party", user.userId, token)
             assertNotNull(chatId)
@@ -434,7 +434,7 @@ class ApplicationTest {
             // Create init user and chat
             val user = NewUserInfo("teapot29", "Teapot", "i_am_a_teapot")
             myServer.usersCreate(user.userId, user.displayName, user.password)
-            val token = myServer.singIn(user.userId, user.password)
+            val token = myServer.signIn(user.userId, user.password)
             assertNotNull(token)
             val chatId = myServer.chatsCreate("Tea Party", user.userId, token)
             assertNotNull(chatId)
@@ -458,7 +458,7 @@ class ApplicationTest {
             // Create init user and chat
             val user = NewUserInfo("teapot31", "Teapot", "i_am_a_teapot")
             myServer.usersCreate(user.userId, user.displayName, user.password)
-            val token = myServer.singIn(user.userId, user.password)
+            val token = myServer.signIn(user.userId, user.password)
             assertNotNull(token)
 
             val chatId = myServer.chatsCreate("Tea Party", user.userId, token)
@@ -469,7 +469,7 @@ class ApplicationTest {
             // Create user, who will be invited
             val invUser = NewUserInfo("teapot32", "Teapot", "i_am_a_teapot")
             myServer.usersCreate(invUser.userId, invUser.displayName, invUser.password)
-            val invToken = myServer.singIn(invUser.userId, invUser.password)
+            val invToken = myServer.signIn(invUser.userId, invUser.password)
 
             // Invite
             myServer.usersInviteToChat(invUser.userId, chatId.chatId, user.userId, token)
