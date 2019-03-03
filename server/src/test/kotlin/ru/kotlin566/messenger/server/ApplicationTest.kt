@@ -6,7 +6,7 @@ import org.junit.jupiter.api.DynamicTest
 import org.junit.jupiter.api.DynamicTest.dynamicTest
 import java.util.NoSuchElementException
 import java.util.concurrent.atomic.AtomicInteger
-import kotlin.properties.Delegates
+import kotlin.test.assertFails
 
 // TODO cleanup packages' mess
 
@@ -142,9 +142,7 @@ class ApplicationTest {
         @Test
         fun testBadPassword() {
             val user = newDummy()
-            val userInfo = getUserInfo(user)
-            assertEquals(user.displayName, userInfo.displayName)
-            assertEquals(user.userId, userInfo.userId)
+            getUserInfo(user)
             assertThrows(UserNotAuthorizedException::class.java) {myServer.signIn(user.userId, user.password + "_and_i_like_tea")}
         }
 
@@ -152,10 +150,7 @@ class ApplicationTest {
         fun testBadLogout() {
             val user = newDummy()
             val userInfo = getUserInfo(user)
-            assertEquals(user.displayName, userInfo.displayName)
-            assertEquals(user.userId, userInfo.userId)
             val token = getToken(user)
-            assertNotNull(token)
             val gotUserInfo = myServer.checkUserAuthorization(user.userId, token)
             assertSame(userInfo, gotUserInfo)
             assertThrows(UserNotAuthorizedException::class.java) {myServer.signOut(user.userId, token + "qwerty")}
@@ -164,9 +159,7 @@ class ApplicationTest {
         @Test
         fun testNonExistingUserLogin() {
             val user = newDummy()
-            val userInfo = getUserInfo(user)
-            assertEquals(user.displayName, userInfo.displayName)
-            assertEquals(user.userId, userInfo.userId)
+            getUserInfo(user)
             assertThrows(NoSuchElementException::class.java) {myServer.signIn(user.userId + "_qwerty鷗", user.password)}
         }
 
@@ -174,10 +167,7 @@ class ApplicationTest {
         fun testNonExistingLogout() {
             val user = newDummy()
             val userInfo = getUserInfo(user)
-            assertEquals(user.displayName, userInfo.displayName)
-            assertEquals(user.userId, userInfo.userId)
             val token = getToken(user)
-            assertNotNull(token)
             val gotUserInfo = myServer.checkUserAuthorization(user.userId, token)
             assertSame(userInfo, gotUserInfo)
             assertThrows(NoSuchElementException::class.java) {myServer.signOut(user.userId + "_1qwerty鷗", token)}
@@ -215,7 +205,6 @@ class ApplicationTest {
         fun testNonExistingAnother() {
             val user = newDummy()
             val token = getToken(user)
-            assertNotNull(token)
             assertThrows(NoSuchElementException::class.java) {myServer.usersListById(user.userId + "_qwerty鷗", user.userId, token)}
         }
 
@@ -223,7 +212,6 @@ class ApplicationTest {
         fun testNonExistingYou() {
             val user = newDummy()
             val token = getToken(user)
-            assertNotNull(token)
             assertThrows(NoSuchElementException::class.java) {myServer.usersListById(user.userId, user.userId + "_qwerty鷗", token)}
         }
 
@@ -232,7 +220,6 @@ class ApplicationTest {
             val user = newDummy()
             getUserInfo(user)
             val token = getToken(user)
-            assertNotNull(token)
             assertThrows(UserNotAuthorizedException::class.java) {myServer.usersListById(user.userId, user.userId, token + "qwerty")}
         }
     }
@@ -241,7 +228,7 @@ class ApplicationTest {
     inner class UsersListByNameTest {
         @Test
         fun testNormal() {
-            val user = newDummy(displayName = "NotATeapot_NONONO")
+            val user = newDummy(displayName = "NotATeapot_OHNO")
             val userInfo = getUserInfo(user)
             val token = getToken(user)
             assertNotNull(token)
@@ -261,7 +248,6 @@ class ApplicationTest {
         fun testNonExistingAnother() {
             val myUser = newDummy()
             val token = getToken(myUser)
-            assertNotNull(token)
             val list = myServer.usersListByName(myUser.displayName + "_qwerty鷗", myUser.userId, token)
             assertEquals(0, list.size)
         }
@@ -270,7 +256,6 @@ class ApplicationTest {
         fun testNonExistingYou() {
             val user = newDummy()
             val token = getToken(user)
-            assertNotNull(token)
             assertThrows(NoSuchElementException::class.java) {myServer.usersListById(user.displayName, user.userId + "_qwerty鷗", token)}
         }
 
@@ -278,7 +263,6 @@ class ApplicationTest {
         fun testWrongToken() {
             val user = newDummy()
             val token = getToken(user)
-            assertNotNull(token)
             assertThrows(UserNotAuthorizedException::class.java) {myServer.usersListById(user.displayName, user.userId, token + "qwerty")}
         }
     }
@@ -302,7 +286,6 @@ class ApplicationTest {
         fun testNonExisting() {
             val user = newDummy()
             val token = getToken(user)
-            assertNotNull(token)
             assertThrows(NoSuchElementException::class.java) {myServer.chatsCreate("Tea Party", user.userId + "_qwerty鷗", token)}
         }
 
@@ -310,7 +293,6 @@ class ApplicationTest {
         fun testWrongToken() {
             val user = newDummy()
             val token = getToken(user)
-            assertNotNull(token)
             assertThrows(UserNotAuthorizedException::class.java) {createChat(user, token + "qwerty")}
         }
     }
@@ -338,30 +320,8 @@ class ApplicationTest {
 
             val messages = getSystemMessageAboutChat(invUser, invToken, chatId)
             assertNotNull(messages)
-        }
-
-        @Test
-        fun testNormalAlreadyInvited() {
-            // Create init user and chat
-            val user = newDummy()
-            val token = getToken(user)
-            assertNotNull(token)
-            val chatId = createChat(user, token)
-            assertNotNull(chatId)
-            val listOfChats = myServer.usersListChats(user.userId, token)
-            assertSame(chatId, listOfChats.find { it == chatId })
-
-            // Create user, who will be invited
-            val invUser = newDummy()
-            val invToken = getToken(invUser)
-
-            // Invite twice
-            myServer.usersInviteToChat(invUser.userId, chatId.chatId, user.userId, token)
-            myServer.usersInviteToChat(invUser.userId, chatId.chatId, user.userId, token)
-
-            val messages = getSystemMessageAboutChat(invUser, invToken, chatId)
-            assertEquals(2, messages.size)
-            assertEquals(messages[0].text, messages[1].text)
+            val secret = getSecret(messages[0])
+            assertNotNull(secret)
         }
 
         @Test
@@ -369,9 +329,7 @@ class ApplicationTest {
             // Create init user and chat
             val user = newDummy()
             val token = getToken(user)
-            assertNotNull(token)
             val chatId = createChat(user, token)
-            assertNotNull(chatId)
 
             // Invite non-existing
             assertThrows(NoSuchElementException::class.java) {myServer.usersInviteToChat(user.userId + "_qwerty鷗", chatId.chatId, user.userId, token)}
@@ -382,9 +340,7 @@ class ApplicationTest {
             // Create init user and chat
             val user = newDummy()
             val token = getToken(user)
-            assertNotNull(token)
             val chatId = createChat(user, token)
-            assertNotNull(chatId)
 
             val invUser = newDummy()
             getUserInfo(invUser)
@@ -397,10 +353,7 @@ class ApplicationTest {
             // Create init user and chat
             val user = newDummy()
             val token = getToken(user)
-            assertNotNull(token)
             val chatId = createChat(user, token)
-            assertNotNull(chatId)
-
             val invUser = newDummy()
             getUserInfo(invUser)
 
@@ -408,10 +361,6 @@ class ApplicationTest {
             assertThrows(UserNotAuthorizedException::class.java) {myServer.usersInviteToChat(invUser.userId, chatId.chatId, user.userId, token + "_qwerty鷗")}
         }
     }
-
-    // TODO testChatsJoin: invite normal person to existing chat, invite already joined person to a chat,
-    // TODO invite normal person to non-existing chat, invite non-existing person to chat, invite normal person to chat with wrong secret,
-    // TODO invite normal person with wrong auth to chat, invite non-existing person to non-existing chat, invite normal person with wrong auth to chat with wrong secret.
 
     @Nested
     inner class ChatsJoinTest {
@@ -434,18 +383,275 @@ class ApplicationTest {
             myServer.usersInviteToChat(invUser.userId, chatId.chatId, user.userId, token)
             val secret = getSecret(invUser, invToken, chatId)
 
-            myServer.chatsJoin(chatId.chatId, secret.toString(), invUser.userId, invToken)
+            myServer.chatsJoin(chatId.chatId, secret, invUser.userId, invToken)
             assert(myServer.usersListChats(invUser.userId, invToken).contains(chatId))
+        }
+
+        @Test
+        fun testJoinJoined() {
+            // Create init user and chat
+            val user = newDummy()
+            val token = getToken(user)
+            val chatId = createChat(user, token)
+
+            // Create user, who will be invited
+            val invUser = newDummy()
+            val invToken = getToken(invUser)
+
+            // Invite
+            myServer.usersInviteToChat(invUser.userId, chatId.chatId, user.userId, token)
+            val secret = getSecret(invUser, invToken, chatId)
+
+            myServer.chatsJoin(chatId.chatId, secret, invUser.userId, invToken)
+            assert(myServer.usersListChats(invUser.userId, invToken).contains(chatId))
+            assertThrows(UserAlreadyMemberException::class.java) {myServer.chatsJoin(chatId.chatId, secret, invUser.userId, invToken)}
+        }
+
+        @Test
+        fun testInviteToNonExisting() {
+            val user = newDummy()
+            val token = getToken(user)
+            assertFails { myServer.chatsJoin(-123, "abcdef12", user.userId, token) }
+        }
+
+        @Test
+        fun testWrongSecret() {
+            // Create init user and chat
+            val user = newDummy()
+            val token = getToken(user)
+            val chatId = createChat(user, token)
+
+            // Create user, who will be invited
+            val invUser = newDummy()
+            val invToken = getToken(invUser)
+
+            myServer.usersInviteToChat(invUser.userId, chatId.chatId, user.userId, token)
+            val secret = getSecret(invUser, invToken, chatId)
+
+            assertThrows(WrongChatSecretException::class.java) { myServer.chatsJoin(chatId.chatId, "$secret--qwerty", invUser.userId, invToken) }
+        }
+
+        @Test
+        fun testWrongToken() {
+            // Create init user and chat
+            val user = newDummy()
+            val token = getToken(user)
+            val chatId = createChat(user, token)
+
+            // Create user, who will be invited
+            val invUser = newDummy()
+            val invToken = getToken(invUser)
+
+            myServer.usersInviteToChat(invUser.userId, chatId.chatId, user.userId, token)
+            val secret = getSecret(invUser, invToken, chatId)
+
+            assertThrows(UserNotAuthorizedException::class.java) { myServer.chatsJoin(chatId.chatId, secret, invUser.userId, invToken + "abc") }
         }
     }
 
-    // TODO testChatsLeave: remove normal person from chat, remove non-joined person, remove non-existing person,
-    // TODO remove person from their chat with wrong auth, remove non-existing person from non-existing chat.
+    @Nested
+    inner class ChatsLeaveTest {
+        @Test
+        fun testNormal() {
+            // Create init user and chat
+            val user = newDummy()
+            val token = getToken(user)
+            assertNotNull(token)
+            val chatId = createChat(user, token)
+            assertNotNull(chatId)
+            val listOfChats = myServer.usersListChats(user.userId, token)
+            assertSame(chatId, listOfChats.find { it == chatId })
 
-    // TODO testUsersListChats: list from normal person, list from bad auth, list from non-existing person.
+            // Create user, who will be invited
+            val invUser = newDummy()
+            val invToken = getToken(invUser)
 
-    // TODO testChatsMembersList: list of normal person from chat, list of non-joined person, list of non-existing person,
-    // TODO list of person from their chat with wrong auth, list of non-existing person from non-existing chat.
+            // Invite
+            myServer.usersInviteToChat(invUser.userId, chatId.chatId, user.userId, token)
+            val secret = getSecret(invUser, invToken, chatId)
+
+            myServer.chatsJoin(chatId.chatId, secret, invUser.userId, invToken)
+            assert(myServer.usersListChats(invUser.userId, invToken).contains(chatId))
+
+            myServer.chatsLeave(chatId.chatId, invUser.userId, invToken)
+            assertFalse(myServer.usersListChats(invUser.userId, invToken).contains(chatId))
+        }
+
+        @Test
+        fun testLeaveNotJoined() {
+            // Create init user and chat
+            val user = newDummy()
+            val token = getToken(user)
+            assertNotNull(token)
+            val chatId = createChat(user, token)
+            assertNotNull(chatId)
+            // Create user, who will be invited
+            val invUser = newDummy()
+            val invToken = getToken(invUser)
+
+            assertThrows(UserNotMemberException::class.java) { myServer.chatsLeave(chatId.chatId, invUser.userId, invToken) }
+        }
+
+        @Test
+        fun testLeaveNonExisting() {
+            // Create init user and chat
+            val user = newDummy()
+            val token = getToken(user)
+            assertNotNull(token)
+            val chatId = createChat(user, token)
+            assertNotNull(chatId)
+
+            assertFails { myServer.chatsLeave(chatId.chatId, user.userId + "---qwerty", token) }
+        }
+
+        @Test
+        fun testLeaveWrongToken() {
+            // Create init user and chat
+            val user = newDummy()
+            val token = getToken(user)
+            val chatId = createChat(user, token)
+
+            // Create user, who will be invited
+            val invUser = newDummy()
+            val invToken = getToken(invUser)
+
+            // Invite
+            myServer.usersInviteToChat(invUser.userId, chatId.chatId, user.userId, token)
+            val secret = getSecret(invUser, invToken, chatId)
+
+            myServer.chatsJoin(chatId.chatId, secret, invUser.userId, invToken)
+            assert(myServer.usersListChats(invUser.userId, invToken).contains(chatId))
+
+            assertThrows(UserNotAuthorizedException::class.java) { myServer.chatsLeave(chatId.chatId, invUser.userId, invToken + "abc") }
+        }
+
+        @Test
+        fun testLeaveNonExistingChat() {
+            // Create init user
+            val user = newDummy()
+            val token = getToken(user)
+            assertFails { myServer.chatsLeave(-123, user.userId, token) }
+        }
+    }
+
+    @Nested
+    inner class UsersListChatsTest {
+        @Test
+        fun testNormal() {
+            // Create init user and chat
+            val user = newDummy()
+            val token = getToken(user)
+            assertNotNull(token)
+            val chatId = createChat(user, token)
+            assertNotNull(chatId)
+            val listOfChats = myServer.usersListChats(user.userId, token)
+            assertSame(chatId, listOfChats.find { it == chatId })
+
+            // Create user, who will be invited
+            val invUser = newDummy()
+            val invToken = getToken(invUser)
+
+            // Invite
+            myServer.usersInviteToChat(invUser.userId, chatId.chatId, user.userId, token)
+            val secret = getSecret(invUser, invToken, chatId)
+            myServer.chatsJoin(chatId.chatId, secret, invUser.userId, invToken)
+            assert(myServer.usersListChats(invUser.userId, invToken).contains(chatId))
+
+            assertEquals(2, myServer.usersListChats(invUser.userId, invToken).size)
+        }
+
+        @Test
+        fun testWrongToken() {
+            // Create init user and chat
+            val user = newDummy()
+            val token = getToken(user)
+            assertThrows(UserNotAuthorizedException::class.java) { myServer.usersListChats(user.userId, token + "abc") }
+        }
+
+        @Test
+        fun testNonExisting() {
+            // Create init user and chat
+            val user = newDummy()
+            assertFails { myServer.usersListChats(user.userId, "qwerty") }
+        }
+    }
+
+    @Nested
+    inner class ChatsMembersListTest {
+        @Test
+        fun testNormal() {
+            // Create init user and chat
+            val user = newDummy()
+            val token = getToken(user)
+            assertNotNull(token)
+            val chatId = createChat(user, token)
+            assertNotNull(chatId)
+            val listOfChats = myServer.usersListChats(user.userId, token)
+            assertSame(chatId, listOfChats.find { it == chatId })
+
+            // Create user, who will be invited
+            val invUser = newDummy()
+            val invToken = getToken(invUser)
+
+            // Invite
+            myServer.usersInviteToChat(invUser.userId, chatId.chatId, user.userId, token)
+            val secret = getSecret(invUser, invToken, chatId)
+            myServer.chatsJoin(chatId.chatId, secret, invUser.userId, invToken)
+
+            val members = myServer.chatsMembersList(chatId.chatId, user.userId, token)
+            assertEquals(2, members.size)
+            assertNotNull(members.find { it.userId == user.userId })
+            assertNotNull(members.find { it.userId == invUser.userId })
+        }
+
+        @Test
+        fun testNotJoined() {
+            // Create init user and chat
+            val user = newDummy()
+            val token = getToken(user)
+            val chatId = createChat(user, token)
+
+            // Create user, who will be invited
+            val invUser = newDummy()
+            val invToken = getToken(invUser)
+
+            assertThrows(UserNotMemberException::class.java) { myServer.chatsMembersList(chatId.chatId, invUser.userId, invToken) }
+        }
+
+        @Test
+        fun testNonExistingPerson() {
+            // Create init user and chat
+            val user = newDummy()
+            val token = getToken(user)
+            val chatId = createChat(user, token)
+            assertFails { myServer.chatsMembersList(chatId.chatId, user.userId + "---qwerty", "abcdef12") }
+        }
+
+        @Test
+        fun testWrongToken() {
+            // Create init user and chat
+            val user = newDummy()
+            val token = getToken(user)
+            val chatId = createChat(user, token)
+
+            // Create user, who will be invited
+            val invUser = newDummy()
+            val invToken = getToken(invUser)
+
+            // Invite
+            myServer.usersInviteToChat(invUser.userId, chatId.chatId, user.userId, token)
+            val secret = getSecret(invUser, invToken, chatId)
+            myServer.chatsJoin(chatId.chatId, secret, invUser.userId, invToken)
+            assertThrows(UserNotAuthorizedException::class.java) { myServer.chatsMembersList(chatId.chatId, user.userId, token + "abc") }
+        }
+
+        @Test
+        fun testNonExistingChat() {
+            val user = newDummy()
+            val token = getToken(user)
+            assertFails { myServer.chatsMembersList(-123, user.userId, token) }
+        }
+    }
 
     // TODO testChatMessagesCreate: from normal to normal, from not joined to normal, from normal to non-existing,
     // TODO from non-existing to normal, from normal to normal bad auth, from normal to non-existing bad auth,
@@ -457,7 +663,44 @@ class ApplicationTest {
     // TODO testChatMessagesDeleteById: delete normal of normal + check with chatMessagesList(), delete non-existing message from normal,
     // TODO delete normal from non-existing chat, delete normal from not-joined chat by user, delete normal from non-existing user.
 
-    // TODO testCheckUserAuthorization: normal, bad auth, non-existing.
+    @Nested
+    inner class CheckUserAuthorizationTest {
+        @Test
+        fun testNormal() {
+            val user = newDummy()
+            val userInfo = getUserInfo(user)
+            val token = getToken(user)
+            assertSame(userInfo, myServer.checkUserAuthorization(user.userId, token))
+        }
 
-    // TODO testGetSystemUserId & testGetSystemUser: normal.
+        @Test
+        fun testWrongToken() {
+            val user = newDummy()
+            val token = getToken(user)
+            assertThrows(UserNotAuthorizedException::class.java) { myServer.checkUserAuthorization(user.userId, token + "abc") }
+        }
+
+        @Test
+        fun testNonExisting() {
+            val user = newDummy()
+            assertFails { myServer.checkUserAuthorization(user.userId, "abcdef12") }
+        }
+    }
+
+    @Test
+    fun testGetSystemUser() {
+        // Create init user and chat
+        val user = newDummy()
+        val token = getToken(user)
+        assertNotNull(token)
+
+        val systemId = myServer.getSystemUserId()
+        val systemUser = myServer.getSystemUser()
+        assertSame(systemUser.userId, systemId)
+
+        val chats = myServer.usersListChats(user.userId, token)
+        assertEquals(1, chats.size)
+        val chat = chats[0].chatId
+        assertNotNull(myServer.chatsMembersList(chat, user.userId, token).find { it.userId == systemId })
+    }
 }
