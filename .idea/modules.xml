@@ -3,8 +3,8 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/.idea/kotlin-messenger.iml" filepath="$PROJECT_DIR$/.idea/kotlin-messenger.iml" />
-      <module fileurl="file://$PROJECT_DIR$/kotlin-messenger.iml" filepath="$PROJECT_DIR$/kotlin-messenger.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/kotlin-messenger.iml" filepath="$PROJECT_DIR$/.idea/modules/kotlin-messenger.iml" />
+      <module fileurl="file://$PROJECT_DIR$/kotlin-messenger.iml" filepath="$PROJECT_DIR$/kotlin-messenger.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/server/ru.kotlin566.messenger.server.iml" filepath="$PROJECT_DIR$/.idea/modules/server/ru.kotlin566.messenger.server.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/server/ru.kotlin566.messenger.server.iml" filepath="$PROJECT_DIR$/.idea/modules/server/ru.kotlin566.messenger.server.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/server/ru.kotlin566.messenger.server.main.iml" filepath="$PROJECT_DIR$/.idea/modules/server/ru.kotlin566.messenger.server.main.iml" />

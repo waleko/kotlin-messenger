@@ -3,9 +3,12 @@ package ru.kotlin566.messenger.client
 import ru.kotlin566.messenger.server.*
 import java.io.IOException
 import org.springframework.security.crypto.keygen.KeyGenerators.string
-import com.sun.corba.se.spi.presentation.rmi.StubAdapter.request
+//import com.sun.corba.se.spi.presentation.rmi.StubAdapter.request
 import okhttp3.*
 import okhttp3.RequestBody
+import org.json.simple.JSONObject
+
+
 
 
 
@@ -32,7 +35,7 @@ class MessengerClient(private val server: MessengerServer) {
             val serverAnswer = response.body().string()
 
             if (serverAnswer == null) {
-                println("Bad health, test answer is null.")
+                println("Bad health, test answer is null.")     //TODO: to work on getting answers!
             }
             println(serverAnswer.toString())
 
@@ -42,16 +45,16 @@ class MessengerClient(private val server: MessengerServer) {
     }
 
     fun register(login: String, name: String, password: String) {
-//        val request = Request.Builder()       TODO: Continue work
-//                .url("$PATH/v1/users/")
-//                .post(FormBody.Builder()
-//                        .add("userId", login)
-//                        .add("displayName", name)
-//                        .add("password", password)
-//                        .build())
-//                .build()
-//        val body = RequestBody.create(JSON_T, JSON)
-//        val request = Request.Builder()
+        val jsonObject = JSONObject();
+        jsonObject.put("userId", login)
+        jsonObject.put("displayName", name)
+        jsonObject.put("password", password)
+        val jsonString = jsonObject.toString();
+        val body = RequestBody.create(JSON_T, jsonString)
+        val request = Request.Builder()
+                .url("$PATH/v1/users/")
+                .post(body)
+                .build()
         try {
             val response = client.newCall(request).execute()
 
