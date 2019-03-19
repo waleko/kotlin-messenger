@@ -207,6 +207,7 @@ class MessengerServer {
             // Лучше удалять текст и помечать сообщение как удалённое
             storage.removeMessage(message)
         }
+        // TODO Добавить exception?
     }
 
     private fun checkUserIsMemberOfChat(chatId: Int, userInfo: UserInfo) =
