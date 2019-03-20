@@ -1,5 +1,6 @@
 package ru.kotlin566.messenger.client
 
+import ru.kotlin566.messenger.client.MessengerClient
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.fail
 import org.junit.jupiter.api.BeforeEach
@@ -7,6 +8,7 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.Assertions.assertThrows
 import org.junit.jupiter.api.Disabled
 import ru.kotlin566.messenger.server.MessengerServer
+import ru.kotlin566.messenger.server.UserAlreadyExistsException
 import ru.kotlin566.messenger.server.WrongChatSecretException
 
 class MessengerTest {
@@ -15,9 +17,15 @@ class MessengerTest {
     private val client1 = MessengerClient(server)
     private val client2 = MessengerClient(server)
 
-    private val login1 = """РОБЕРТ"; DROP TABLE Users; --"""
-    private val password1 = "password"
-    private val name1 = "Роберт-Брось-Таблицу"
+
+    private val login1 = "Пользователь 1"
+    private val password1 = "пароль номер 1"
+    private val name1 = "Первый"
+
+
+    private val loginSQLi = """РОБЕРТ"; DROP TABLE Users; --"""
+    private val passwordSQLiInLogin = "password"
+    private val nameSQLiInLogin = "Роберт-Брось-Таблицу"
 
     private val login2 = "user2"
     private val password2 = "123456"
@@ -144,21 +152,27 @@ class MessengerTest {
 
     @Test
     fun TwoSameClients() {
-        client1 = register(login1, name1, password1)
-        client2 = register(login1, name1, password1)
+        client1.register(login1, name1, password1)
+        client2.register(login1, name1, password1)
         assertThrows(UserAlreadyExistsException::class.java) {}
     }
 
     @Test
     fun TwoUsersOfSameClient() {
-        client1 = register(login1, name1, password1)
-        client2 = register(login2, name2, password2)
+        client1.register(login1, name1, password1)
+        client2.register(login2, name2, password2)
         val user1 = client1.signIn(login1, password1)
         val user2 = client1.signIn(login1, password1)
         val user1chat = user1.createChat("""Существующий чат""")
         user1chat.refresh()
         user1chat.inviteUser(user2.userId)
         assertThrows(UserIsAlreadyInChatException::class.java) {}
+    }
+
+    @Test
+    fun SQLiInLogin(){
+        client1.register(loginSQLi,nameSQLiInLogin,passwordSQLiInLogin)
+
     }
 
 }
