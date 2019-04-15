@@ -155,7 +155,7 @@ class Storage {
                 .filter{ it.memberId in chatMembers && (createdAfter == null || it.createdOn >= createdAfter) }
                 .sortedBy { it.createdOn }
     }
-
+//
     fun findMessageById(messageId: Int) : MessageInfo? {
         return messages.firstOrNull { it.messageId == messageId }
     }
