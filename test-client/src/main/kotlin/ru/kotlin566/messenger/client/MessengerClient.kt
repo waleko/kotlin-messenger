@@ -11,13 +11,13 @@ class MessengerClient(private val server: MessengerServer) {
         server.usersCreate(login, name, password)
     }
 
-    fun singIn(userId: String, password: String): User {
-        val token = server.singIn(userId, password)
+    fun signIn(userId: String, password: String): User {
+        val token = server.signIn(userId, password)
         return User(userId, token, this)
     }
 
-    fun singOut(userId: String, token: String) {
-        server.singOut(userId, token)
+    fun signOut(userId: String, token: String) {
+        server.signOut(userId, token)
     }
 
     fun usersListById(userIdToFind: String, userId: String, token: String): List<UserInfo> {

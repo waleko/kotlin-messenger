@@ -16,7 +16,7 @@ class User internal constructor(val userId: String, var token: String, client: M
     }
 
     fun signOut() {
-        client.singOut(userId, token)
+        client.signOut(userId, token)
     }
 
     fun refresh() {
