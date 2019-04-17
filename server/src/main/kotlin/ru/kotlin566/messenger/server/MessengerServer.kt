@@ -41,7 +41,7 @@ class MessengerServer {
         storage.addChatMember(member)
     }
 
-    fun singIn(userId: String, password: String) : String {
+    fun signIn(userId: String, password: String) : String {
         val user = getUserById(userId)
         if (!passwordEncoder.matches(password, user.passwordHash)) {
             throw UserNotAuthorizedException()
@@ -51,7 +51,7 @@ class MessengerServer {
         return token
     }
 
-    fun singOut(userId: String, token: String) {
+    fun signOut(userId: String, token: String) {
         checkUserAuthorization(userId, token)
         storage.removeToken(token)
     }
@@ -207,6 +207,7 @@ class MessengerServer {
             // Лучше удалять текст и помечать сообщение как удалённое
             storage.removeMessage(message)
         }
+        // TODO Добавить exception?
     }
 
     private fun checkUserIsMemberOfChat(chatId: Int, userInfo: UserInfo) =
