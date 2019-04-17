@@ -2,14 +2,10 @@
 <project version="4">
   <component name="CompilerConfiguration">
     <bytecodeTargetLevel>
-      <module name="de.swirtz.kotlin.webdev.server.main" target="11" />
-      <module name="de.swirtz.kotlin.webdev.server.test" target="11" />
-      <module name="kotlin-messenger.server.main" target="11" />
-      <module name="kotlin-messenger.server.test" target="11" />
-      <module name="ru.kotlin566.messenger.server.main" target="1.8" />
-      <module name="ru.kotlin566.messenger.server.test" target="1.8" />
-      <module name="ru.kotlin566.messenger.test-client.main" target="1.8" />
-      <module name="ru.kotlin566.messenger.test-client.test" target="1.8" />
+      <module name="server_main" target="1.10" />
+      <module name="server_test" target="1.10" />
+      <module name="test-client_main" target="1.10" />
+      <module name="test-client_test" target="1.10" />
     </bytecodeTargetLevel>
   </component>
 </project>
