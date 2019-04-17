@@ -267,7 +267,7 @@ class Storage {
         transaction {
             Messages.insert {
                 it[messageId] = messageInfo.messageId
-                it[createdOn] = messageInfo.createdOn.epochSecond // FIXME непонятно что делать с этим временем, как его настроить
+                it[createdOn] = messageInfo.createdOn
                 it[memberId] = messageInfo.memberId
                 it[text] = messageInfo.text
             }
@@ -275,17 +275,32 @@ class Storage {
         //messages.add(messageInfo)
     }
 //
-    fun findMessages(chatId: Int, afterMessageId : Int = 0) : List<MessageInfo> { //FIXME тоже непонятно что со временем
+    fun findMessages(chatId: Int, afterMessageId : Int = 0) : List<MessageInfo> {
         val chatMembers = findMemberIdsByChatId(chatId)
-        val createdAfter = if (afterMessageId > 0) {
-            messages.firstOrNull { it.messageId == afterMessageId }?.createdOn
+        val createdAfter:Long = if (afterMessageId > 0) {
+            var ans: Long
+            ans = -1
+            transaction { Messages.select { Messages.messageId eq afterMessageId}.map{it[Messages.createdOn]} }.forEach {
+                ans = it
+            }
+            ans
+            //messages.firstOrNull { it.messageId == afterMessageId }?.createdOn
         }
         else {
-            null
+            -1
         }
-        return messages
-                .filter{ it.memberId in chatMembers && (createdAfter == null || it.createdOn >= createdAfter) }
-                .sortedBy { it.createdOn }
+    return transaction { Messages.select{(Messages.memberId inList chatMembers) and (Messages.createdOn greaterEq createdAfter )}
+            .orderBy(Messages.createdOn to SortOrder.ASC).map{
+                MessageInfo(it[Messages.messageId],
+                        it[Messages.memberId],
+                        it[Messages.text],
+                        it[Messages.createdOn]
+                        )
+         }
+    }
+//        return messages
+//                .filter{ it.memberId in chatMembers && (createdAfter == null || it.createdOn >= createdAfter) }
+//                .sortedBy { it.createdOn }
     }
 //
     fun findMessageById(messageId: Int) : MessageInfo? {
@@ -300,8 +315,8 @@ class Storage {
             )
         }
     }
-        return ans
-        //return messages.firstOrNull { it.messageId == messageId }
+    return ans
+    //return messages.firstOrNull { it.messageId == messageId }
     }
 
     fun removeMessage(messageInfo: MessageInfo) {
