@@ -32,6 +32,7 @@ dependencies {
 
     testCompile ("io.ktor:ktor-server-tests:$ktorVersion")
     testCompile ("org.junit.jupiter:junit-jupiter-api:5.0.2")
+    testCompile("org.junit.jupiter:junit-jupiter-engine:5.0.2")
 }
 
 val test by tasks.getting(Test::class) {
