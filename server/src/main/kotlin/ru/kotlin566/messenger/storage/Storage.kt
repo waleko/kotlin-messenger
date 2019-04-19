@@ -1,5 +1,6 @@
 package ru.kotlin566.messenger.storage
 
+import ch.qos.logback.core.subst.Token
 import ru.kotlin566.messenger.server.*
 import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.transactions.transaction
@@ -8,34 +9,49 @@ import org.jetbrains.exposed.sql.transactions.transaction
  */
 
 
-
+object Dbconst{
+    const val nameLength = 64
+    const val messageLength = 1000
+}
 
 object Users : Table(){
-    val userId: Column<String> = varchar("userId", 50).autoIncrement().primaryKey()
-    val displayName: Column<String> = varchar("displayName", 50)
-    val passwordHash: Column<String> = varchar("passwordHash", 64)
+    val userId: Column<String> = varchar("userId", Dbconst.nameLength).autoIncrement().primaryKey()
+    val displayName: Column<String> = varchar("displayName", Dbconst.nameLength)
+    val passwordHash: Column<String> = varchar("passwordHash", Dbconst.nameLength)
 }
 
 
 object Chats : Table(){
     val chatId: Column<Int> = integer("chatId").autoIncrement().primaryKey()
-    val defaultName: Column<String> = varchar("defaultName", 64)
+    val defaultName: Column<String> = varchar("defaultName", Dbconst.nameLength)
 }
 
 object Members : Table(){
     val memberId: Column<Int> = integer("memberId").autoIncrement().primaryKey()
     val chatId: Column<Int> = integer("chatId")
-    val chatDisplayName: Column<String> = varchar("chatDisplayName", 64)
-    val memberDisplayName: Column<String> = varchar("memberDisplayName", 64)
-    val userId: Column<String> = varchar("userId", 64)
+    val chatDisplayName: Column<String> = varchar("chatDisplayName", Dbconst.nameLength)
+    val memberDisplayName: Column<String> = varchar("memberDisplayName", Dbconst.nameLength)
+    val userId: Column<String> = varchar("userId", Dbconst.nameLength)
 }
 
 object  Messages : Table(){
     val messageId: Column<Int> = integer("messageId").autoIncrement().primaryKey()
     val memberId: Column<Int> = integer("memberId")
-    val text: Column<String> = varchar("text", 1000)
+    val text: Column<String> = varchar("text", Dbconst.messageLength)
     val createdOn: Column<Long> = long("createdOn")
 }
+
+
+object ChatId2secret : Table(){
+    val chatId: Column<Int> = integer("chatId").primaryKey().uniqueIndex()
+    val secret: Column <String> = varchar("secret", Dbconst.nameLength)
+}
+
+object Token2userId : Table(){
+    val token: Column<String> = varchar("token", Dbconst.nameLength).primaryKey().uniqueIndex()
+    val userId: Column <String> = varchar("userId", Dbconst.nameLength)
+}
+
 
 class Storage {
 
@@ -51,10 +67,12 @@ class Storage {
 
     fun clear() {
         transaction {
-            token2userId.clear() //????
+            //TODO специально ли мы не сбрасываем chatId2secret????
+            SchemaUtils.drop(Token2userId)
             SchemaUtils.drop(Chats)
             SchemaUtils.drop(Members)
             SchemaUtils.drop(Messages)
+            SchemaUtils.create(Token2userId)
             SchemaUtils.create(Chats)
             SchemaUtils.create(Members)
             SchemaUtils.create(Messages)
@@ -81,7 +99,6 @@ class Storage {
 
     fun containsUser(userId: String): Boolean {
         return transaction { Users.select{Users.userId eq userId}.count()} > 0
-        //return users.any { it.userId == userId }
     }
 
     fun addUser(newUserInfo: UserInfo) {
@@ -94,7 +111,6 @@ class Storage {
                 it[passwordHash] = newUserInfo.passwordHash
             }
         }
-        //users.add(newUserInfo)
     }
 
     fun findUserById(userId: String): UserInfo? {
@@ -106,19 +122,31 @@ class Storage {
             }
         }
         return ans
-        //return users.first { it.userId == userId }
     }
 
     fun addToken(userId: String, token: String) {
-        token2userId[token] = userId
+        transaction {
+            Token2userId.insert{
+                it[Token2userId.token] = token
+                it[Token2userId.userId] = userId
+            }
+        }
     }
 
     fun getUserIdByToken(token: String) : String? {
-        return token2userId[token]
+        var ans: String? = null
+        transaction {
+            Token2userId.select{Token2userId.token eq token}.forEach {
+                ans = it[Token2userId.userId]
+            }
+        }
+        return ans
     }
 
     fun removeToken(token: String) {
-        token2userId.remove(token)
+        transaction {
+            Token2userId.deleteWhere { Token2userId.token eq token }
+        }
     }
 
     fun findUsersByPartOfName(partOfName: String?): List<UserInfo> {
@@ -127,7 +155,6 @@ class Storage {
                 UserInfo(it[Users.userId], it[Users.displayName], it[Users.passwordHash])
             }
         }
-        // return users.filter { partOfName == null || it.displayName.contains(partOfName) }
     }
 
     fun addChat(newChatInfo: ChatInfo) {
@@ -136,34 +163,28 @@ class Storage {
                 it[defaultName]= newChatInfo.defaultName
             }
         }
-        //chats.add(newChatInfo)
     }
 
     fun containsChat(chatId: Int): Boolean {
         return transaction { Chats.select{Chats.chatId eq chatId}.count() } > 0
-        // return chats.any { it.chatId == chatId }
     }
 
     fun findChatById(chatId: Int): ChatInfo? {
-        var ans :ChatInfo?
-        ans = null
+        var ans :ChatInfo? = null
         transaction {
             Chats.select { Chats.chatId eq chatId }.forEach {
                 ans = ChatInfo(it[Chats.chatId], it[Chats.defaultName])
             }
         }
         return ans
-        //return chats.firstOrNull { it.chatId == chatId }
     }
 
     fun containsMember(chatId: Int, userId: String) : Boolean {
         return transaction {Members.select{(Members.chatId eq chatId) and (Members.userId eq userId)}.count()} > 0
-        // return members.any { it.chatId == chatId && it.userId == userId}
     }
 
     fun findMemberByChatIdAndUserId(chatId: Int, userId: String) : MemberInfo? {
-        var ans : MemberInfo?
-        ans = null
+        var ans : MemberInfo? = null
         transaction {
             Members.select { (Members.chatId eq chatId) and (Members.userId eq userId) }.forEach {
                 ans = MemberInfo(it[Members.memberId],
@@ -174,12 +195,10 @@ class Storage {
             }
         }
         return ans
-        //return members.firstOrNull { it.chatId == chatId && it.userId == userId}
     }
 
     fun findMemberById(memberId: Int) : MemberInfo? {
-        var ans :MemberInfo?
-        ans = null
+        var ans :MemberInfo? = null
         transaction {
             Members.select { (Members.memberId eq memberId) }.forEach {
                 ans = MemberInfo(it[Members.memberId],
@@ -190,12 +209,10 @@ class Storage {
             }
         }
         return ans
-        // return members.firstOrNull { it.memberId == memberId }
     }
 
     fun containsMember(memberId: Int) : Boolean {
         return transaction {Members.select{(Members.memberId eq memberId) }.count()} > 0
-        // return members.any { it.memberId == memberId }
     }
 
     fun addChatMember(newMemberInfo: MemberInfo) {
@@ -214,10 +231,15 @@ class Storage {
     }
 
     fun addChatSecret(chatId: Int, secret: String) {
-        if (chatId2secret[chatId] != null) {
+        if (transaction { ChatId2secret.select{ChatId2secret.chatId eq chatId}.count() } > 0) {
             throw SecretAlreadyExistsException()
         }
-        chatId2secret[chatId] = secret
+        transaction {
+            ChatId2secret.insert {
+                it[ChatId2secret.chatId] = chatId
+                it[ChatId2secret.secret] = secret
+            }
+        }
     }
 
     fun findChatIdsByUserId(userId: String) : List<Int> {
@@ -226,7 +248,6 @@ class Storage {
                 it[Members.chatId]
             }
         }
-        //return members.filter { it.userId == userId }.map { it.chatId }
     }
 
     private fun findMemberIdsByChatId(chatId: Int) : List<Int> {
@@ -235,7 +256,6 @@ class Storage {
                 it[Members.memberId]
             }
         }
-        //return findMembersByChatId(chatId).map { it.memberId }
     }
 
     fun findMembersByChatId(chatId: Int): List<MemberInfo> {
@@ -248,7 +268,6 @@ class Storage {
                         it[Members.userId])
             }
         }
-        // return members.filter { it.chatId == chatId }
     }
 
     fun findCommonChatIds(userId1: String, userId2: String): List<Int> {
@@ -257,7 +276,13 @@ class Storage {
     }
 
     fun getChatSecret(chatId: Int): String? {
-        return chatId2secret[chatId]
+        var ans:String? = null
+        transaction {
+            ChatId2secret.select{ChatId2secret.chatId eq chatId}.forEach {
+                ans = it[ChatId2secret.secret]
+            }
+        }
+        return ans
     }
 
     fun addMessage(messageInfo: MessageInfo) {
@@ -272,40 +297,33 @@ class Storage {
                 it[text] = messageInfo.text
             }
         }
-        //messages.add(messageInfo)
     }
-//
+
     fun findMessages(chatId: Int, afterMessageId : Int = 0) : List<MessageInfo> {
         val chatMembers = findMemberIdsByChatId(chatId)
         val createdAfter:Long = if (afterMessageId > 0) {
-            var ans: Long
-            ans = -1
+            var ans: Long = -1
             transaction { Messages.select { Messages.messageId eq afterMessageId}.map{it[Messages.createdOn]} }.forEach {
                 ans = it
             }
             ans
-            //messages.firstOrNull { it.messageId == afterMessageId }?.createdOn
         }
         else {
             -1
         }
     return transaction { Messages.select{(Messages.memberId inList chatMembers) and (Messages.createdOn greaterEq createdAfter )}
-            .orderBy(Messages.createdOn to SortOrder.ASC).map{
+            .orderBy(Messages.createdOn, SortOrder.ASC).map{
                 MessageInfo(it[Messages.messageId],
                         it[Messages.memberId],
                         it[Messages.text],
                         it[Messages.createdOn]
                         )
-         }
+            }
+        }
     }
-//        return messages
-//                .filter{ it.memberId in chatMembers && (createdAfter == null || it.createdOn >= createdAfter) }
-//                .sortedBy { it.createdOn }
-    }
-//
+
     fun findMessageById(messageId: Int) : MessageInfo? {
-    var ans :MessageInfo?
-    ans = null
+    var ans :MessageInfo? = null
     transaction {
         Messages.select { Messages.messageId eq messageId }.forEach {
             ans = MessageInfo(
@@ -316,21 +334,17 @@ class Storage {
         }
     }
     return ans
-    //return messages.firstOrNull { it.messageId == messageId }
     }
 
     fun removeMessage(messageInfo: MessageInfo) {
         transaction {
             Messages.deleteWhere { Messages.messageId eq messageInfo.messageId }
         }
-        //messages.remove(messageInfo)
     }
 
     fun removeMember(memberInfo: MemberInfo) {
         transaction {
             Members.deleteWhere { Members.memberId eq memberInfo.memberId }
         }
-        //members.remove(memberInfo)
     }
-
 }
