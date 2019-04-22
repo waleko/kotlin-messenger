@@ -38,3 +38,7 @@ dependencies {
 val test by tasks.getting(Test::class) {
     useJUnitPlatform ()
 }
+
+application {
+    mainClassName = "ru.kotlin566.messenger.server.ApplicationKt"
+}
