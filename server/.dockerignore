@@ -1,8 +1,8 @@
-/src
-/out
-/.gradle
-/build.gradle.kts
-/gradle.properties
-/settings.gradle.kts
-/build
-!/build/install
+src
+out
+.gradle
+build.gradle.kts
+gradle.properties
+settings.gradle.kts
+build
+!build/install

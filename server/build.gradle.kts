@@ -1,6 +1,11 @@
+import de.gesellix.gradle.docker.tasks.DockerBuildTask
+import de.gesellix.gradle.docker.tasks.DockerPushTask
+import de.gesellix.gradle.docker.tasks.DockerRmiTask
+
 plugins {
     kotlin("jvm") version "1.3.20"
     application
+    id("de.gesellix.docker") version "2019-04-07T21-31-01"
 }
 
 group = "ru.kotlin566.messenger"
@@ -41,4 +46,40 @@ val test by tasks.getting(Test::class) {
 
 application {
     mainClassName = "ru.kotlin566.messenger.server.ApplicationKt"
+}
+val build = if (project.hasProperty("teamcity")) {
+        (project.properties["teamcity"] as Map<*, *>) ["build.number"]
+    }
+    else {
+        "local_build"
+    } as String
+version = build
+
+val dockerImageName = "kotlin566/kotlin-messenger:$version"
+val dockerRegistry = "registry.promoatlas.ru"
+println("Version = $version")
+tasks {
+    val removeLocalDockerImage = register<DockerRmiTask>("removeLocalDockerImage") {
+        imageId = dockerImageName
+    }
+    val removeTaggedDockerImage = register<DockerRmiTask>("removeTaggedDockerImage") {
+        imageId = "$dockerRegistry/$dockerImageName"
+    }
+    register<Task>("removeDockerImages") {
+        group = "Docker"
+        dependsOn(removeLocalDockerImage, removeTaggedDockerImage)
+    }
+
+    val buildDockerImage = register<DockerBuildTask>("buildDockerImage") {
+        imageName = dockerImageName
+        setBuildContextDirectory(file("./"))
+        println("Building $dockerImageName")
+    }
+
+    register<DockerPushTask>("pushDockerImage") {
+        dependsOn(buildDockerImage)
+        repositoryName = dockerImageName
+        registry = dockerRegistry
+        println("Publishing $dockerRegistry/$dockerImageName")
+    }
 }
