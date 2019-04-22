@@ -73,13 +73,17 @@ tasks {
     val buildDockerImage = register<DockerBuildTask>("buildDockerImage") {
         imageName = dockerImageName
         setBuildContextDirectory(file("./"))
-        println("Building $dockerImageName")
+        doFirst {
+            println("Building $dockerImageName")
+        }
     }
 
     register<DockerPushTask>("pushDockerImage") {
         dependsOn(buildDockerImage)
         repositoryName = dockerImageName
         registry = dockerRegistry
-        println("Publishing $dockerRegistry/$dockerImageName")
+        doFirst {
+            println("Publishing $dockerRegistry/$dockerImageName")
+        }
     }
 }
