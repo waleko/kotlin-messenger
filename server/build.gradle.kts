@@ -34,6 +34,7 @@ dependencies {
 
     compile ("org.jetbrains.exposed:exposed:0.13.2")
     compile ("mysql:mysql-connector-java:5.1.46")
+    compile ("com.h2database:h2:1.4.197")
 
     testCompile ("org.junit.jupiter:junit-jupiter-api:5.0.2")
     testCompile("org.junit.jupiter:junit-jupiter-engine:5.0.2")

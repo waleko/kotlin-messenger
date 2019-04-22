@@ -15,7 +15,7 @@ object Dbconst{
 }
 
 object Users : Table(){
-    val userId: Column<String> = varchar("userId", Dbconst.nameLength).autoIncrement().primaryKey()
+    val userId: Column<String> = varchar("userId", Dbconst.nameLength).primaryKey()
     val displayName: Column<String> = varchar("displayName", Dbconst.nameLength)
     val passwordHash: Column<String> = varchar("passwordHash", Dbconst.nameLength)
 }
@@ -53,11 +53,14 @@ object Token2userId : Table(){
 }
 
 
-class Storage (val connection:Database = Database.connect("jdbc:mysql://localhost:3306/test?useSSL=false", driver = "com.mysql.jdbc.Driver",
-        user = "root", password = "Programming")) {
+class Storage (//val connection:Database = Database.connect("jdbc:mysql://localhost:3306/test?useSSL=false", driver = "com.mysql.jdbc.Driver",
+       // user = "root", password = "Programming")
+val connection:Database = Database.connect("jdbc:h2:mem:regular;DB_CLOSE_DELAY=-1;", "org.h2.Driver")
+) {
 
     init{
-        transaction(connection) {
+        transaction {
+            SchemaUtils.create(Users)
             SchemaUtils.create(Token2userId)
             SchemaUtils.create(Chats)
             SchemaUtils.create(Members)
@@ -88,6 +91,8 @@ class Storage (val connection:Database = Database.connect("jdbc:mysql://localhos
             SchemaUtils.drop(Chats)
             SchemaUtils.drop(Members)
             SchemaUtils.drop(Messages)
+            SchemaUtils.drop(Users)
+            SchemaUtils.create(Users)
             SchemaUtils.create(Token2userId)
             SchemaUtils.create(Chats)
             SchemaUtils.create(Members)
@@ -124,6 +129,7 @@ class Storage (val connection:Database = Database.connect("jdbc:mysql://localhos
         }
         transaction(connection){
             Users.insert{
+                it[userId] = newUserInfo.userId
                 it[displayName] = newUserInfo.displayName
                 it[passwordHash] = newUserInfo.passwordHash
             }
