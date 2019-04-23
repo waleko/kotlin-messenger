@@ -10,8 +10,8 @@ import org.jetbrains.exposed.sql.transactions.transaction
 
 
 object Dbconst{
-    const val nameLength = 64
-    const val messageLength = 1000
+    const val nameLength = 120
+    const val messageLength = 2000
 }
 
 object Users : Table(){
@@ -22,12 +22,12 @@ object Users : Table(){
 
 
 object Chats : Table(){
-    val chatId: Column<Int> = integer("chatId").autoIncrement().primaryKey()
+    val chatId: Column<Int> = integer("chatId").primaryKey()
     val defaultName: Column<String> = varchar("defaultName", Dbconst.nameLength)
 }
 
 object Members : Table(){
-    val memberId: Column<Int> = integer("memberId").autoIncrement().primaryKey()
+    val memberId: Column<Int> = integer("memberId").primaryKey()
     val chatId: Column<Int> = integer("chatId")
     val chatDisplayName: Column<String> = varchar("chatDisplayName", Dbconst.nameLength)
     val memberDisplayName: Column<String> = varchar("memberDisplayName", Dbconst.nameLength)
@@ -35,7 +35,7 @@ object Members : Table(){
 }
 
 object  Messages : Table(){
-    val messageId: Column<Int> = integer("messageId").autoIncrement().primaryKey()
+    val messageId: Column<Int> = integer("messageId").primaryKey()
     val memberId: Column<Int> = integer("memberId")
     val text: Column<String> = varchar("text", Dbconst.messageLength)
     val createdOn: Column<Long> = long("createdOn")
@@ -59,7 +59,13 @@ val connection:Database = Database.connect("jdbc:h2:mem:regular;DB_CLOSE_DELAY=-
 ) {
 
     init{
-        transaction {
+        transaction(connection) {
+//            SchemaUtils.drop(Token2userId)
+//            SchemaUtils.drop(ChatId2secret)
+//            SchemaUtils.drop(Chats)
+//            SchemaUtils.drop(Members)
+//            SchemaUtils.drop(Messages)
+//            SchemaUtils.drop(Users)
             SchemaUtils.create(Users)
             SchemaUtils.create(Token2userId)
             SchemaUtils.create(Chats)
@@ -183,6 +189,7 @@ val connection:Database = Database.connect("jdbc:h2:mem:regular;DB_CLOSE_DELAY=-
     fun addChat(newChatInfo: ChatInfo) {
         transaction(connection){
             Chats.insert{
+                it[chatId] = newChatInfo.chatId
                 it[defaultName]= newChatInfo.defaultName
             }
         }

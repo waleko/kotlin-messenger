@@ -37,7 +37,7 @@ class ApplicationTest {
         val chatId = myServer.chatsCreate(name, user.userId, token)
         assertNotNull(chatId)
         val listOfChats = myServer.usersListChats(user.userId, token)
-        assertSame(chatId, listOfChats.find { it == chatId })
+        assertEquals(chatId, listOfChats.find { it == chatId })
         return chatId
     }
 
@@ -137,7 +137,7 @@ class ApplicationTest {
             assertEquals(user.userId, userInfo.userId)
             val token = getToken(user)
             val gotUserInfo = myServer.checkUserAuthorization(user.userId, token)
-            assertSame(userInfo, gotUserInfo)
+            assertEquals(userInfo, gotUserInfo) //TODO как-то странно сработал assertSame- действительно нужно именно его использовать(про одинаковых юзеров говорит, что они разные)
             myServer.signOut(user.userId, token)
             assertThrows(UserNotAuthorizedException::class.java) { myServer.checkUserAuthorization(user.userId, token) }
         }
@@ -155,7 +155,7 @@ class ApplicationTest {
             val userInfo = getUserInfo(user)
             val token = getToken(user)
             val gotUserInfo = myServer.checkUserAuthorization(user.userId, token)
-            assertSame(userInfo, gotUserInfo)
+            assertEquals(userInfo, gotUserInfo)
             assertThrows(UserNotAuthorizedException::class.java) { myServer.signOut(user.userId, token + "qwerty") }
         }
 
@@ -172,7 +172,7 @@ class ApplicationTest {
             val userInfo = getUserInfo(user)
             val token = getToken(user)
             val gotUserInfo = myServer.checkUserAuthorization(user.userId, token)
-            assertSame(userInfo, gotUserInfo)
+            assertEquals(userInfo, gotUserInfo)
             assertThrows(NoSuchElementException::class.java) { myServer.signOut(user.userId + "_1qwerty鷗", token) }
         }
     }
@@ -186,7 +186,7 @@ class ApplicationTest {
             val token = getToken(user)
             val list = myServer.usersListById(user.userId, user.userId, token)
             assertEquals(1, list.size)
-            assertSame(userInfo, list[0])
+            assertEquals(userInfo, list[0])
         }
 
         @Test
@@ -199,7 +199,7 @@ class ApplicationTest {
 
             val list = myServer.usersListById(user.userId, myUser.userId, token)
             assertEquals(1, list.size)
-            assertSame(userInfo, list[0])
+            assertEquals(userInfo, list[0])
         }
 
         @Test
@@ -235,14 +235,14 @@ class ApplicationTest {
 
             val list = myServer.usersListByName(user.displayName, user.userId, token)
             assertEquals(1, list.size)
-            assertSame(userInfo, list[0])
+            assertEquals(userInfo, list[0])
 
             val testUser2 = newDummyUser(user.displayName + "2")
             val userInfo2 = getUserInfo(testUser2)
             val list2 = myServer.usersListByName(user.displayName, user.userId, getToken(user))
             assertEquals(2, list2.size)
-            assertSame(userInfo2, list2.find { it.userId == testUser2.userId })
-            assertSame(userInfo, list2.find { it.userId == user.userId })
+            assertEquals(userInfo2, list2.find { it.userId == testUser2.userId })
+            assertEquals(userInfo, list2.find { it.userId == user.userId })
         }
 
         @Test
@@ -278,7 +278,7 @@ class ApplicationTest {
             val token = getToken(user)
             val chatId = createChat(user, token)
             val listOfChats = myServer.usersListChats(user.userId, getToken(user))
-            assertSame(chatId, listOfChats.find { it == chatId })
+            assertEquals(chatId, listOfChats.find { it == chatId })
         }
 
         @Test
@@ -306,7 +306,7 @@ class ApplicationTest {
 
             val chatId = createChat(user, token)
             val listOfChats = myServer.usersListChats(user.userId, token)
-            assertSame(chatId, listOfChats.find { it == chatId })
+            assertEquals(chatId, listOfChats.find { it == chatId })
 
             // Create user, who will be invited
             val invUser = newDummyUser()
@@ -366,7 +366,7 @@ class ApplicationTest {
             val token = getToken(user)
             val chatId = createChat(user, token)
             val listOfChats = myServer.usersListChats(user.userId, token)
-            assertSame(chatId, listOfChats.find { it == chatId })
+            assertEquals(chatId, listOfChats.find { it == chatId })
 
             // Create user, who will be invited
             val invUser = newDummyUser()
@@ -451,7 +451,7 @@ class ApplicationTest {
             val token = getToken(user)
             val chatId = createChat(user, token)
             val listOfChats = myServer.usersListChats(user.userId, token)
-            assertSame(chatId, listOfChats.find { it == chatId })
+            assertEquals(chatId, listOfChats.find { it == chatId })
 
             // Create user, who will be invited
             val invUser = newDummyUser()
@@ -530,7 +530,7 @@ class ApplicationTest {
             val token = getToken(user)
             val chatId = createChat(user, token)
             val listOfChats = myServer.usersListChats(user.userId, getToken(user))
-            assertSame(chatId, listOfChats.find { it == chatId })
+            assertEquals(chatId, listOfChats.find { it == chatId })
 
             // Create user, who will be invited
             val invUser = newDummyUser()
@@ -571,7 +571,7 @@ class ApplicationTest {
             val token = getToken(user)
             val chatId = createChat(user, token)
             val listOfChats = myServer.usersListChats(user.userId, token)
-            assertSame(chatId, listOfChats.find { it == chatId })
+            assertEquals(chatId, listOfChats.find { it == chatId })
 
             // Create user, who will be invited
             val invUser = newDummyUser()
@@ -663,7 +663,7 @@ class ApplicationTest {
                     val token = getToken(user)
                     val chatId = createChat(user, token)
                     val listOfChats = myServer.usersListChats(user.userId, token)
-                    assertSame(chatId, listOfChats.find { it == chatId })
+                    assertEquals(chatId, listOfChats.find { it == chatId })
                     // TODO add messages sending loop
 
                     // Create user, who will be invited
@@ -787,7 +787,7 @@ class ApplicationTest {
             val token = getToken(user)
             val chatId = createChat(user, token)
             val listOfChats = myServer.usersListChats(user.userId, token)
-            assertSame(chatId, listOfChats.find { it == chatId })
+            assertEquals(chatId, listOfChats.find { it == chatId })
 
             // Create user, who will be invited
             val invUser = newDummyUser()
@@ -852,7 +852,7 @@ class ApplicationTest {
             val user = newDummyUser()
             val userInfo = getUserInfo(user)
             val token = getToken(user)
-            assertSame(userInfo, myServer.checkUserAuthorization(user.userId, token))
+            assertEquals(userInfo, myServer.checkUserAuthorization(user.userId, token))
         }
 
         @Test
@@ -877,7 +877,7 @@ class ApplicationTest {
 
         val systemId = myServer.getSystemUserId()
         val systemUser = myServer.getSystemUser()
-        assertSame(systemUser.userId, systemId)
+        assertEquals(systemUser.userId, systemId)
 
         val chats = myServer.usersListChats(user.userId, token)
         assertEquals(1, chats.size)
