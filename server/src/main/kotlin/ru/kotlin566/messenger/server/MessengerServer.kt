@@ -215,7 +215,7 @@ class MessengerServer {
 
     private fun getSystemChatId(userId: String) = storage.findCommonChatIds(userId, systemUser.userId).first()
 
-    private fun getUserById(userId: String) = storage.findUserById(userId) ?: throw UserNotFoundException()
+    internal fun getUserById(userId: String) = storage.findUserById(userId) ?: throw UserNotFoundException()
 
     fun checkUserAuthorization(userId: String, token: String) : UserInfo {
         val user = getUserById(userId)

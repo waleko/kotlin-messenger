@@ -28,9 +28,11 @@ dependencies {
     compile ("org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlinVersion")
     compile ("io.ktor:ktor-server-netty:$ktorVersion")
     compile ("io.ktor:ktor-server-core:$ktorVersion")
+    compile ("io.ktor:ktor-server-cio:$ktorVersion")
     compile ("io.ktor:ktor-auth:$ktorVersion")
     compile ("io.ktor:ktor-auth-jwt:$ktorVersion")
     compile ("io.ktor:ktor-jackson:$ktorVersion")
+    compile ("io.ktor:ktor-auth-jwt:$ktorVersion")
     compile ("ch.qos.logback:logback-classic:$logbackVersion")
 
     compile ("org.springframework.security:spring-security-config:$springSecurityVersion")
