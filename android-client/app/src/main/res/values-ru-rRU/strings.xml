@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Kotlin566 Messenger</string>
+    <string name="action_settings">Настройки</string>
+    <string name="action_sign_in">Войдите в учётную запись или зарегистрируйтесь</string>
+    <string name="action_sign_in_short">Войти</string>
+    <string name="invalid_password">Пароль должен быть >5 знаков</string>
+</resources>

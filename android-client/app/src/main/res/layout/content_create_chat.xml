@@ -6,11 +6,13 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         app:layout_behavior="@string/appbar_scrolling_view_behavior"
-        tools:showIn="@layout/activity_main"
-        tools:context=".MainActivity">
+        tools:showIn="@layout/activity_create_chat"
+        tools:context=".CreateChat">
+
     <android.support.v7.widget.RecyclerView
             android:layout_width="match_parent"
             android:layout_height="match_parent" tools:layout_editor_absoluteY="0dp"
-            tools:layout_editor_absoluteX="0dp" android:id="@+id/chatList"
-            tools:listitem="@layout/chat_view_item" android:scrollbars="vertical"/>
+            tools:layout_editor_absoluteX="0dp"
+            tools:listitem="@layout/user_view_item" android:scrollbarAlwaysDrawHorizontalTrack="false"
+            android:scrollbars="horizontal"/>
 </android.support.constraint.ConstraintLayout>
