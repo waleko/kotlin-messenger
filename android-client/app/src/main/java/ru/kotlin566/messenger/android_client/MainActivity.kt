@@ -1,5 +1,6 @@
 package ru.kotlin566.messenger.android_client
 
+import android.app.ActivityOptions
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity;
 import android.view.Menu
@@ -7,18 +8,22 @@ import android.view.MenuItem
 import kotlinx.android.synthetic.main.activity_create_chat.toolbar as chatCreateToolbar
 
 import kotlinx.android.synthetic.main.activity_main.*
+import android.content.Intent
 
 class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        // TODO check saved login & password or active token
+
         setContentView(R.layout.activity_main)
+
         setSupportActionBar(toolbar)
         fab.setOnClickListener {
-            setContentView(R.layout.activity_create_chat)
-            setSupportActionBar(chatCreateToolbar)
+            val k = Intent(this, CreateChat::class.java)
+            startActivity(k, ActivityOptions.makeSceneTransitionAnimation(this).toBundle())
         }
+
+//        val chats = RequestsHandler.usersListChats()
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {

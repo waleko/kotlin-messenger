@@ -3,6 +3,7 @@ package ru.kotlin566.messenger.android_client.ui.login
 import android.app.Activity
 import android.arch.lifecycle.Observer
 import android.arch.lifecycle.ViewModelProviders
+import android.content.Intent
 import android.os.Bundle
 import android.support.annotation.StringRes
 import android.support.v7.app.AppCompatActivity
@@ -14,6 +15,8 @@ import android.widget.Button
 import android.widget.EditText
 import android.widget.ProgressBar
 import android.widget.Toast
+import ru.kotlin566.messenger.android_client.CreateChat
+import ru.kotlin566.messenger.android_client.MainActivity
 
 import ru.kotlin566.messenger.android_client.R
 
@@ -100,12 +103,14 @@ class LoginActivity : AppCompatActivity() {
     private fun updateUiWithUser(model: LoggedInUserView) {
         val welcome = getString(R.string.welcome)
         val displayName = model.displayName
-        // TODO : initiate successful logged in experience
         Toast.makeText(
             applicationContext,
             "$welcome $displayName",
             Toast.LENGTH_LONG
         ).show()
+        val newIntent = Intent(this, MainActivity::class.java)
+        newIntent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+        startActivity(newIntent)
     }
 
     private fun showLoginFailed(@StringRes errorString: Int) {

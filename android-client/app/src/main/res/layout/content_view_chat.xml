@@ -6,13 +6,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         app:layout_behavior="@string/appbar_scrolling_view_behavior"
-        tools:showIn="@layout/activity_create_chat"
-        tools:context=".CreateChat">
+        tools:showIn="@layout/activity_view_chat"
+        tools:context=".ViewChat">
 
-    <android.support.v7.widget.RecyclerView
-            android:layout_width="match_parent"
-            android:layout_height="match_parent" tools:layout_editor_absoluteY="0dp"
-            tools:layout_editor_absoluteX="0dp"
-            tools:listitem="@layout/user_select_item" android:scrollbarAlwaysDrawHorizontalTrack="false"
-            android:scrollbars="horizontal"/>
 </android.support.constraint.ConstraintLayout>

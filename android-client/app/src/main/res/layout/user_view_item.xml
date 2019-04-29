@@ -9,7 +9,8 @@
           android:id="@+id/profilePictureView"
           android:layout_width="50dp"
           android:layout_height="50dp"
-          tools:src="@tools:sample/avatars" android:contentDescription="@string/profile_picture"/>
+          tools:src="@tools:sample/avatars" android:contentDescription="@string/profile_picture"
+          android:layout_gravity="center"/>
   <TextView
           android:id="@+id/displayName"
           android:layout_width="wrap_content"

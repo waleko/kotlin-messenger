@@ -4,13 +4,13 @@ import android.os.Bundle
 import android.support.design.widget.Snackbar
 import android.support.v7.app.AppCompatActivity;
 
-import kotlinx.android.synthetic.main.activity_create_chat.*
+import kotlinx.android.synthetic.main.activity_view_chat.*
 
-class CreateChat : AppCompatActivity() {
+class ViewChat : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_create_chat)
+        setContentView(R.layout.activity_view_chat)
         setSupportActionBar(toolbar)
 
         supportActionBar?.setDisplayHomeAsUpEnabled(true)

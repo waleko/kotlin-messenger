@@ -5,7 +5,7 @@
         xmlns:tools="http://schemas.android.com/tools"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        tools:context=".CreateChat">
+        tools:context=".ViewChat">
 
     <android.support.design.widget.AppBarLayout
             android:layout_height="wrap_content"
@@ -21,6 +21,6 @@
 
     </android.support.design.widget.AppBarLayout>
 
-    <include layout="@layout/content_create_chat"/>
+    <include layout="@layout/content_view_chat"/>
 
 </android.support.design.widget.CoordinatorLayout>

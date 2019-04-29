@@ -14,8 +14,6 @@ class LoginDataSource {
             // TODO: handle loggedInUser authentication
             val token = RequestsHandler.login(username, password)
 //            val user = RequestsHandler.usersListById(username, username, token).first()
-//
-//            val fakeUser = LoggedInUser(username, user.)
             val fakeUser = LoggedInUser(username, username, token)
             return Result.Success(fakeUser)
         } catch (e: Throwable) {
@@ -25,6 +23,7 @@ class LoginDataSource {
 
     fun logout() {
         // TODO: revoke authentication
+        // RequestsHandler.logout()
     }
 }
 

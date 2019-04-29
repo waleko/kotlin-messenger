@@ -3,4 +3,8 @@
     <color name="colorPrimary">#008577</color>
     <color name="colorPrimaryDark">#00574B</color>
     <color name="colorAccent">#D81B60</color>
+    <color name="colorMessage">#2196F3</color>
+    <color name="colorMessageMyStart">#0189ff</color>
+    <color name="colorMessageMyEnd">#01f1fa</color>
+    <color name="colorWhiteText">#F1F1F1</color>
 </resources>
