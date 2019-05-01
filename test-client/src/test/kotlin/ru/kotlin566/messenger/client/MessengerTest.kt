@@ -31,7 +31,7 @@ class MessengerTest {
     }
 
     // TODO: something wrong with this test, or with program. oh.
-    @Disabled
+//    @Disabled
     @Test
     fun testMessageSending() {
 
@@ -146,12 +146,22 @@ class MessengerTest {
     }
 
     @Test
+    @Disabled
     fun testHealthRequest() {
         client1.checkAlive()        //TODO: I need an assert, but come on
         client1.register("MARK", "Mark", "12345678")
         val user = client1.signIn("MARK", "12345678")
 
-        client1.usersListById(user.userId, user.userId, user.token)
+        val chat = client1.chatsCreate("CHATTER", user.userId, user.token)
+
+        client1.register("NOT MARK", "Seth", "87654321")
+        val user2 = client1.signIn("NOT MARK", "87654321")
+
+        client1.usersInviteToChat("NOT MARK", chat.chatId, "MARK", user.token)
+
+        println(client1.chatsMembersList(chat.chatId, "MARK", user.token))
+
+        client1.signOut(user.userId, user.token)
     }
 
 }

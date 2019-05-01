@@ -44,60 +44,42 @@ class MessengerClient(private val server: MessengerServer) {
             return response.body().string()
         } catch (e: IOException) {
             e.printStackTrace()
+            println("Smthng bd, answer is null.")           //TODO: Error codes!
             return null
         }
     }
 
-    fun checkAlive() {
+    fun checkAlive(): String {
         val serverAnswer = makeRequest(emptyMap(), emptyMap(), false, "$PATH/v1/health")
-        println(serverAnswer)
+
+        return serverAnswer.toString()
     }
 
-    fun register(login: String, name: String, password: String) {
+    fun register(login: String, name: String, password: String): String {
         val serverAnswer = makeRequest(mapOf("userId" to login, "displayName" to name, "password" to password), emptyMap(), true, "$PATH/v1/users/")
 
-        if (serverAnswer == null) {
-            println("Smthng bd, answer is null.")           //TODO: Error codes!
-        }
-        println(serverAnswer.toString())
+        return serverAnswer.toString()
     }
 
     fun signIn(userId: String, password: String): User {
         val serverAnswer = makeRequest(mapOf("password" to password), emptyMap(), true, "$PATH/v1/users/$userId/signin")
 
-        if (serverAnswer == null) {
-            println("Smthng bd, answer is null.")           //TODO: Error codes!
-        }
-
         val token = mapper.readValue<Token>(serverAnswer.toString())
-        println(serverAnswer.toString())
-        println(token)
         return User(userId, token.token, this)
-
     }
 
     fun signOut(userId: String, token: String) {
-        server.signOut(userId, token)
+        val serverAnswer = makeRequest(mapOf("userId" to userId), mapOf("Authorization: Bearer" to token), true, "$PATH/v1/me/signout/")
     }
 
     fun usersListById(userIdToFind: String, userId: String, token: String): List<UserInfo> {
         val serverAnswer = makeRequest(emptyMap(), mapOf("Authorization: Bearer " to token), false, "$PATH/v1/users/$userId")
-
-        if (serverAnswer == null) {
-            println("Smthng bd, answer is null.")           //TODO: Error codes!
-        }
-        println(serverAnswer.toString())
 
         return listOf(mapper.readValue<UserInfo>(serverAnswer.toString()))
     }
 
     fun usersListChats(userId: String, token: String): List<ChatInfo> {
         val serverAnswer = makeRequest(emptyMap(), mapOf("Authorization: Bearer " to token), false, "$PATH/v1/me/chats")
-
-        if (serverAnswer == null) {
-            println("Smthng bd, answer is null.")           //TODO: Error codes!
-        }
-        println(serverAnswer.toString())
 
         return mapper.readValue<List<ChatInfo>>(serverAnswer.toString())
     }
@@ -108,15 +90,19 @@ class MessengerClient(private val server: MessengerServer) {
     }
 
     fun chatsCreate(chatName: String, userId: String, token: String): ChatInfo {
-        return server.chatsCreate(chatName, userId, token)
+        val serverAnswer = makeRequest(mapOf("defaultName" to chatName), mapOf("Authorization: Bearer " to token), true, "$PATH/v1/chats/")
+
+        return mapper.readValue<ChatInfo>(serverAnswer.toString())
     }
 
     fun chatsJoin(chatId: Int, secret: String, userId: String, token: String, chatName: String? = null) {
         server.chatsJoin(chatId, secret, userId, token, chatName)
     }
 
-    fun usersInviteToChat(userIdToInvite: String, chatId: Int, userId: String, token: String) {
-        server.usersInviteToChat(userIdToInvite, chatId, userId, token)
+    fun usersInviteToChat(userIdToInvite: String, chatId: Int, userId: String, token: String): Status {
+        val serverAnswer = makeRequest(mapOf("userId" to userIdToInvite), mapOf("Authorization: Bearer " to token), true, "$PATH/v1/chats/$chatId/invite/")
+
+        return mapper.readValue<Status>(serverAnswer.toString())
     }
 
     fun chatMessagesCreate(chatId: Int, text: String, userId: String, token: String): MessageInfo {
@@ -126,11 +112,6 @@ class MessengerClient(private val server: MessengerServer) {
     fun chatsMembersList(chatId: Int, userId: String, token: String): List<MemberInfo> {
         val serverAnswer = makeRequest(emptyMap(), mapOf("Authorization: Bearer " to token), false, "$PATH/v1/chats/$chatId/members")
 
-        if (serverAnswer == null) {
-            println("Smthng bd, answer is null.")           //TODO: Error codes!
-        }
-        println(serverAnswer.toString())
-
         return mapper.readValue<List<MemberInfo>>(serverAnswer.toString())
     }
 
@@ -138,13 +119,7 @@ class MessengerClient(private val server: MessengerServer) {
     fun chatMessagesList(chatId: Int, userId: String, token: String): List<MessageInfo> {
         val serverAnswer = makeRequest(emptyMap(), mapOf("Authorization: Bearer " to token), false, "$PATH/v1/chats/$chatId/messages")
 
-        if (serverAnswer == null) {
-            println("Smthng bd, answer is null.")           //TODO: Error codes!
-        }
-        println(serverAnswer.toString())
-
         return mapper.readValue<List<MessageInfo>>(serverAnswer.toString())
-
     }
 }
 
