@@ -1,4 +1,4 @@
-package ru.kotlin566.messenger.client
+package ru.kotlin566.messenger.server
 
 import io.ktor.http.HttpMethod
 import io.ktor.http.HttpStatusCode
@@ -9,10 +9,7 @@ import kotlin.test.Test
 import kotlin.test.assertEquals
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue
-import org.junit.Assert.assertTrue
-import ru.kotlin566.messenger.server.NewUserInfo
-import ru.kotlin566.messenger.server.PasswordInfo
-import ru.kotlin566.messenger.server.module
+import io.ktor.server.testing.TestApplicationRequest
 import kotlin.test.assertNotNull
 
 class ApplicationTest {
@@ -32,7 +29,7 @@ class ApplicationTest {
     data class ClientUserInfo(val userId: String, val displayName: String)
 
     @Test
-    fun testUserCreation() {
+    fun testUserCreateSignInSignOut() {
         val userData = NewUserInfo("pupkin", "Pupkin", "password")
         withTestApplication({ module() }) {
 
@@ -51,7 +48,7 @@ class ApplicationTest {
                 // Login
                 handleRequest {
                     method = HttpMethod.Post
-                    uri = "/v1/users/pupkin/singin"
+                    uri = "/v1/users/pupkin/signin"
                     addHeader("Content-type", "application/json")
                     setBody(objectMapper.writeValueAsString(PasswordInfo("password")))
                 }.apply {
@@ -59,13 +56,12 @@ class ApplicationTest {
                     val tokenInfo = objectMapper.readValue<HashMap<String,String>>(response.content!!)
                     val token = tokenInfo["token"]
                     assertNotNull(token)
-                    assertTrue(token.length == 36)
-
-
+                    println("Token = $token")
                     // Logout
                     handleRequest {
                         method = HttpMethod.Post
-                        uri = "/v1/me/singout?_user_id=pupkin&_token=$token"
+                        uri = "/v1/me/signout"
+                        addJwtHeader(token)
                     }.apply {
                         assertEquals(HttpStatusCode.OK, response.status())
                     }
@@ -73,4 +69,6 @@ class ApplicationTest {
             }
         }
     }
+
+    private fun TestApplicationRequest.addJwtHeader(token: String) = addHeader("Authorization", "Bearer $token")
 }

@@ -1,15 +1,13 @@
 package ru.kotlin566.messenger.client
 
+import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
+import com.fasterxml.jackson.module.kotlin.readValue
 import ru.kotlin566.messenger.server.*
 import java.io.IOException
 import org.springframework.security.crypto.keygen.KeyGenerators.string
-//import com.sun.corba.se.spi.presentation.rmi.StubAdapter.request
 import okhttp3.*
 import okhttp3.RequestBody
 import org.json.simple.JSONObject
-
-
-
 
 
 /**
@@ -22,9 +20,6 @@ class MessengerClient(private val server: MessengerServer) {
     val client = OkHttpClient()
 
     fun checkAlive() {
-//        val formBody: RequestBody = FormBody.Builder()
-//                .add("message", "Your message")
-//                .build()
         val request = Request.Builder()
                 .url("$PATH/v1/health")
                 .get()
@@ -71,22 +66,93 @@ class MessengerClient(private val server: MessengerServer) {
 
     }
 
-    fun singIn(userId: String, password: String): User {
-        val token = server.singIn(userId, password)
-        return User(userId, token, this)
+    fun signIn(userId: String, password: String): User {
+        val jsonObject = JSONObject()
+        jsonObject.put("password", password)
+        val jsonString = jsonObject.toString()
+        val body = RequestBody.create(JSON_T, jsonString)
+        val request = Request.Builder()
+                .url("$PATH/v1/users/$userId/signin")
+                .post(body)
+                .build()
+        try {
+            val response = client.newCall(request).execute()
+
+            val serverAnswer = response.body().string()
+
+            val mapper = jacksonObjectMapper()
+
+            if (serverAnswer == null) {
+                println("Smthng bd, answer is null.")           //TODO: Error codes!
+            }
+
+            val token = mapper.readValue<Token>(serverAnswer.toString())
+            println(serverAnswer.toString())
+            println(token)
+            return User(userId, token.token, this)
+
+        } catch (e: IOException) {
+            e.printStackTrace()
+            return User("NULL", "NULL", this)   //FIXME: NullUser
+        }
     }
 
-    fun singOut(userId: String, token: String) {
-        server.singOut(userId, token)
+    fun signOut(userId: String, token: String) {
+        server.signOut(userId, token)
     }
 
     fun usersListById(userIdToFind: String, userId: String, token: String): List<UserInfo> {
-        return server.usersListById(userIdToFind, userId, token)
+        val request = Request.Builder()
+                .url("$PATH/v1/users/$userId")
+                .addHeader("Authorization: Bearer ", token)
+                .get()
+                .build()
+        try {
+            val response = client.newCall(request).execute()
+
+            val serverAnswer = response.body().string()
+
+            val mapper = jacksonObjectMapper()
+
+            if (serverAnswer == null) {
+                println("Smthng bd, answer is null.")           //TODO: Error codes!
+            }
+            println(serverAnswer.toString())
+
+            return listOf(mapper.readValue<UserInfo>(serverAnswer.toString()))
+
+        } catch (e: IOException) {
+            e.printStackTrace()
+            return emptyList()
+        }
     }
 
     fun usersListChats(userId: String, token: String): List<ChatInfo> {
-        return server.usersListChats(userId, token)
+        val request = Request.Builder()
+                .url("$PATH/v1/me/chats")
+                .addHeader("Authorization: Bearer ", token)
+                .get()
+                .build()
+        try {
+            val response = client.newCall(request).execute()
+
+            val serverAnswer = response.body().string()
+
+            val mapper = jacksonObjectMapper()
+
+            if (serverAnswer == null) {
+                println("Smthng bd, answer is null.")           //TODO: Error codes!
+            }
+            println(serverAnswer.toString())
+
+            return mapper.readValue<List<ChatInfo>>(serverAnswer.toString())
+
+        } catch (e: IOException) {
+            e.printStackTrace()
+            return emptyList()
+        }
     }
+
 
     fun getSystemUserId(): String {
         return server.getSystemUserId()
@@ -109,11 +175,56 @@ class MessengerClient(private val server: MessengerServer) {
     }
 
     fun chatsMembersList(chatId: Int, userId: String, token: String): List<MemberInfo> {
-        return server.chatsMembersList(chatId, userId, token)
+        val request = Request.Builder()
+                .url("$PATH/v1/chats/$chatId/members")
+                .addHeader("Authorization: Bearer ", token)
+                .get()
+                .build()
+        try {
+            val response = client.newCall(request).execute()
+
+            val serverAnswer = response.body().string()
+
+            val mapper = jacksonObjectMapper()
+
+            if (serverAnswer == null) {
+                println("Smthng bd, answer is null.")           //TODO: Error codes!
+            }
+            println(serverAnswer.toString())
+
+            return mapper.readValue<List<MemberInfo>>(serverAnswer.toString())
+
+        } catch (e: IOException) {
+            e.printStackTrace()
+            return emptyList()
+        }
     }
 
+
     fun chatMessagesList(chatId: Int, userId: String, token: String): List<MessageInfo> {
-        return server.chatMessagesList(chatId, userId, token)
+        val request = Request.Builder()
+                .url("$PATH/v1/chats/$chatId/messages")
+                .addHeader("Authorization: Bearer ", token)
+                .get()
+                .build()
+        try {
+            val response = client.newCall(request).execute()
+
+            val serverAnswer = response.body().string()
+
+            val mapper = jacksonObjectMapper()
+
+            if (serverAnswer == null) {
+                println("Smthng bd, answer is null.")           //TODO: Error codes!
+            }
+            println(serverAnswer.toString())
+
+            return mapper.readValue<List<MessageInfo>>(serverAnswer.toString())
+
+        } catch (e: IOException) {
+            e.printStackTrace()
+            return emptyList()
+        }
     }
 }
 
