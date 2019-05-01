@@ -6,6 +6,8 @@
       <module name="de.swirtz.kotlin.webdev.server.test" target="11" />
       <module name="kotlin-messenger.server.main" target="11" />
       <module name="kotlin-messenger.server.test" target="11" />
+      <module name="kotlin-messenger.test-client.main" target="11" />
+      <module name="kotlin-messenger.test-client.test" target="11" />
       <module name="ru.kotlin566.messenger.server.main" target="11" />
       <module name="ru.kotlin566.messenger.server.test" target="11" />
       <module name="ru.kotlin566.messenger.test-client.main" target="11" />
