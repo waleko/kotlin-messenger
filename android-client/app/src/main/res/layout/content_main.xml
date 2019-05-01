@@ -7,10 +7,10 @@
         android:layout_height="match_parent"
         app:layout_behavior="@string/appbar_scrolling_view_behavior"
         tools:showIn="@layout/activity_main"
-        tools:context=".MainActivity">
+        tools:context=".HomeActivity">
     <android.support.v7.widget.RecyclerView
             android:layout_width="match_parent"
             android:layout_height="match_parent" tools:layout_editor_absoluteY="0dp"
             tools:layout_editor_absoluteX="0dp" android:id="@+id/chatList"
-            tools:listitem="@layout/chat_view_item" android:scrollbars="vertical"/>
+            tools:listitem="@layout/chat_view_item" android:scrollbars="vertical" tools:itemCount="13"/>
 </android.support.constraint.ConstraintLayout>

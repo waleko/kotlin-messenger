@@ -1,7 +1,7 @@
 package ru.kotlin566.messenger.android_client.ui.login
 
 /**
- * Authentication result : success (user details) or error message_view_item.
+ * Authentication result : success (user details) or error my_message_view_item.
  */
 data class LoginResult(
     val success: LoggedInUserView? = null,

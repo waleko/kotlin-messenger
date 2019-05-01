@@ -9,8 +9,9 @@ import kotlinx.android.synthetic.main.activity_create_chat.toolbar as chatCreate
 
 import kotlinx.android.synthetic.main.activity_main.*
 import android.content.Intent
+import android.widget.LinearLayout
 
-class MainActivity : AppCompatActivity() {
+class HomeActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -23,7 +24,10 @@ class MainActivity : AppCompatActivity() {
             startActivity(k, ActivityOptions.makeSceneTransitionAnimation(this).toBundle())
         }
 
-//        val chats = RequestsHandler.usersListChats()
+//        val layout = findViewById<LinearLayout>(R.id.messagesDisplay)
+//        val child = layoutInflater.inflate(R.layout.my_message_view_item, null)
+//        child.
+//        layout.addView(child)
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {

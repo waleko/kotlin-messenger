@@ -14,7 +14,7 @@ class EmptyMainActivity : AppCompatActivity() {
         val loggedIn = false
         val newIndent: Intent
         if(loggedIn)
-            newIndent = Intent(this, MainActivity::class.java)
+            newIndent = Intent(this, HomeActivity::class.java)
         else
             newIndent = Intent(this, LoginActivity::class.java)
         startActivity(newIndent)
