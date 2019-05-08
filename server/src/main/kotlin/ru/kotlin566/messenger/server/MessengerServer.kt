@@ -37,7 +37,7 @@ class MessengerServer {
 
     private fun createSystemChatForUser(userInfo: UserInfo) {
         val systemChat = doCreateChat("System for ${userInfo.userId}", systemUser)
-        val member = MemberInfo(storage.generateMemberId(), systemChat.chatId, "System", userInfo.displayName, userInfo.userId)
+        val member = MemberInfo(0 /*id база выдаст сама*/, systemChat.chatId, "System", userInfo.displayName, userInfo.userId)
         storage.addChatMember(member)
     }
 
@@ -87,11 +87,10 @@ class MessengerServer {
     }
 
     private fun doCreateChat(chatName: String, userInfo: UserInfo): ChatInfo {
-        val chatId = storage.generateChatId()
-        val chat = ChatInfo(chatId, chatName)
-        storage.addChat(chat)
-        storage.addChatSecret(chatId, generateChatSecret(chatId))
-        val member = MemberInfo(storage.generateMemberId(), chatId, chatName, userInfo.displayName, userInfo.userId)
+        val chatId = storage.addChat(ChatInfo(0 /*база даст сама*/, chatName))
+        val chat = ChatInfo(chatId!!, chatName)
+        storage.addChatSecret(chatId!!, generateChatSecret(chatId!!))
+        val member = MemberInfo(0 /*база даст сама*/, chatId, chatName, userInfo.displayName, userInfo.userId)
         storage.addChatMember(member)
         return chat
     }
@@ -142,7 +141,7 @@ class MessengerServer {
         if (realSecret != secret) {
             throw WrongChatSecretException()
         }
-        val member = MemberInfo(storage.generateMemberId(), chatId, chatName
+        val member = MemberInfo(0 /*база даст сама*/, chatId, chatName
                 ?: defaultChatName, user.displayName, user.userId)
         storage.addChatMember(member)
     }
@@ -182,10 +181,10 @@ class MessengerServer {
     }
 
     private fun doMessagesCreate(memberId: Int, text: String): MessageInfo {
-        val messageId = storage.generateMessageId()
-        val message = MessageInfo(messageId, memberId, text)
-        storage.addMessage(message)
-        return message
+        val message = MessageInfo(0 /*база даст сама*/, memberId, text)
+        val messageId = storage.addMessage(message)
+        val messageToReturn = MessageInfo(messageId!!, memberId, text)
+        return messageToReturn
     }
 
     fun chatMessagesList(chatId: Int, userId: String, token: String, afterId: Int = 1) : List<MessageInfo> {

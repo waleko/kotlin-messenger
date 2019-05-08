@@ -2,10 +2,10 @@
 <project version="4">
   <component name="CompilerConfiguration">
     <bytecodeTargetLevel>
-      <module name="server_main" target="1.10" />
-      <module name="server_test" target="1.10" />
-      <module name="test-client_main" target="1.10" />
-      <module name="test-client_test" target="1.10" />
+      <module name="server_main" target="12" />
+      <module name="server_test" target="12" />
+      <module name="test-client_main" target="12" />
+      <module name="test-client_test" target="12" />
     </bytecodeTargetLevel>
   </component>
 </project>

@@ -2,13 +2,13 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/kotlin-messenger.iml" filepath="$PROJECT_DIR$/.idea/modules/kotlin-messenger.iml" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/server/server.iml" filepath="$PROJECT_DIR$/.idea/modules/server/server.iml" group="server" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/server/server_main.iml" filepath="$PROJECT_DIR$/.idea/modules/server/server_main.iml" group="server" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/server/server_test.iml" filepath="$PROJECT_DIR$/.idea/modules/server/server_test.iml" group="server" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/test-client/test-client.iml" filepath="$PROJECT_DIR$/.idea/modules/test-client/test-client.iml" group="test-client" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/test-client/test-client_main.iml" filepath="$PROJECT_DIR$/.idea/modules/test-client/test-client_main.iml" group="test-client" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/test-client/test-client_test.iml" filepath="$PROJECT_DIR$/.idea/modules/test-client/test-client_test.iml" group="test-client" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/kotlin-messenger.iml" filepath="$PROJECT_DIR$/.idea/modules/kotlin-messenger.iml" group="kotlin-messenger" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/server/server.iml" filepath="$PROJECT_DIR$/.idea/modules/server/server.iml" group="kotlin-messenger/server" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/server/server_main.iml" filepath="$PROJECT_DIR$/.idea/modules/server/server_main.iml" group="kotlin-messenger/server" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/server/server_test.iml" filepath="$PROJECT_DIR$/.idea/modules/server/server_test.iml" group="kotlin-messenger/server" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/test-client/test-client.iml" filepath="$PROJECT_DIR$/.idea/modules/test-client/test-client.iml" group="kotlin-messenger/test-client" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/test-client/test-client_main.iml" filepath="$PROJECT_DIR$/.idea/modules/test-client/test-client_main.iml" group="kotlin-messenger/test-client" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/test-client/test-client_test.iml" filepath="$PROJECT_DIR$/.idea/modules/test-client/test-client_test.iml" group="kotlin-messenger/test-client" />
     </modules>
   </component>
 </project>

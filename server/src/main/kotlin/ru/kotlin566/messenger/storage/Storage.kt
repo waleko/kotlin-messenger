@@ -22,12 +22,12 @@ object Users : Table(){
 
 
 object Chats : Table(){
-    val chatId: Column<Int> = integer("chatId").primaryKey()
+    val chatId: Column<Int> = integer("chatId").autoIncrement().primaryKey()
     val defaultName: Column<String> = varchar("defaultName", Dbconst.nameLength)
 }
 
 object Members : Table(){
-    val memberId: Column<Int> = integer("memberId").primaryKey()
+    val memberId: Column<Int> = integer("memberId").autoIncrement().primaryKey()
     val chatId: Column<Int> = integer("chatId")
     val chatDisplayName: Column<String> = varchar("chatDisplayName", Dbconst.nameLength)
     val memberDisplayName: Column<String> = varchar("memberDisplayName", Dbconst.nameLength)
@@ -35,12 +35,11 @@ object Members : Table(){
 }
 
 object  Messages : Table(){
-    val messageId: Column<Int> = integer("messageId").primaryKey()
+    val messageId: Column<Int> = integer("messageId").autoIncrement().primaryKey()
     val memberId: Column<Int> = integer("memberId")
     val text: Column<String> = varchar("text", Dbconst.messageLength)
     val createdOn: Column<Long> = long("createdOn")
 }
-
 
 object ChatId2secret : Table(){
     val chatId: Column<Int> = integer("chatId").primaryKey().uniqueIndex()
@@ -113,16 +112,28 @@ val connection:Database = Database.connect("jdbc:h2:mem:regular;DB_CLOSE_DELAY=-
         var nextMessageId = 0
     }
 
-    fun generateChatId(): Int {
-        return nextChatId++
-    }
+//    fun generateChatId(): Int {
+//        return nextChatId++
+//    }
+//
+//    fun generateMemberId(): Int {
+//        return nextMemberId++
+//    }
+//
+//    fun generateMessageId(): Int {
+//        return nextMessageId++
+//    }
 
-    fun generateMemberId(): Int {
-        return nextMemberId++
-    }
-
-    fun generateMessageId(): Int {
-        return nextMessageId++
+    fun showMessages(): List<MessageInfo> {
+        return transaction {
+            Messages.selectAll().map{
+                MessageInfo(it[Messages.messageId],
+                            it[Messages.memberId],
+                            it[Messages.text],
+                            it[Messages.createdOn]
+                        )
+            }
+        }
     }
 
     fun containsUser(userId: String): Boolean {
@@ -155,6 +166,7 @@ val connection:Database = Database.connect("jdbc:h2:mem:regular;DB_CLOSE_DELAY=-
 
     fun addToken(userId: String, token: String) {
         transaction(connection) {
+            Token2userId.deleteWhere { Token2userId.token eq token }
             Token2userId.insert{
                 it[Token2userId.token] = token
                 it[Token2userId.userId] = userId
@@ -186,12 +198,12 @@ val connection:Database = Database.connect("jdbc:h2:mem:regular;DB_CLOSE_DELAY=-
         }
     }
 
-    fun addChat(newChatInfo: ChatInfo) {
-        transaction(connection){
+    fun addChat(newChatInfo: ChatInfo) :Int? {
+        return transaction(connection){
             Chats.insert{
-                it[chatId] = newChatInfo.chatId
+                //it[chatId] = newChatInfo.chatId
                 it[defaultName]= newChatInfo.defaultName
-            }
+            } get Chats.chatId
         }
     }
 
@@ -251,7 +263,7 @@ val connection:Database = Database.connect("jdbc:h2:mem:regular;DB_CLOSE_DELAY=-
         }
         transaction(connection) {
             Members.insert {
-                it[memberId] = newMemberInfo.memberId
+                //it[memberId] = newMemberInfo.memberId
                 it[chatDisplayName] = newMemberInfo.chatDisplayName
                 it[memberDisplayName] = newMemberInfo.memberDisplayName
                 it[chatId] = newMemberInfo.chatId
@@ -315,17 +327,17 @@ val connection:Database = Database.connect("jdbc:h2:mem:regular;DB_CLOSE_DELAY=-
         return ans
     }
 
-    fun addMessage(messageInfo: MessageInfo) {
+    fun addMessage(messageInfo: MessageInfo):Int? {
         if (transaction(connection) {Messages.select { Messages.messageId eq messageInfo.messageId }.count()} > 0) {
             throw MessageAlreadyExistsException()
         }
-        transaction(connection) {
+        return transaction(connection) {
             Messages.insert {
-                it[messageId] = messageInfo.messageId
+                //it[messageId] = messageInfo.messageId
                 it[createdOn] = messageInfo.createdOn
                 it[memberId] = messageInfo.memberId
                 it[text] = messageInfo.text
-            }
+            } get Messages.messageId
         }
     }
 

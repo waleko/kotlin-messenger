@@ -5,7 +5,7 @@ import java.time.Instant
 /**
  * Сообщение
  */
-data class MessageInfo (val messageId: Int, val memberId: Int, var text: String,  val createdOn: Long = Instant.now().epochSecond) {
+data class MessageInfo (val messageId: Int, val memberId: Int, var text: String,  val createdOn: Long = Instant.now().toEpochMilli()) {
     // TODO: createdOn must be internal!
 
 

@@ -1,10 +1,12 @@
 package ru.kotlin566.messenger.server
 
+
 import org.junit.jupiter.api.*
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.DynamicTest.dynamicTest
 import java.util.*
 import java.util.concurrent.atomic.AtomicInteger
+import kotlin.NoSuchElementException
 import kotlin.test.assertFails
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
@@ -163,7 +165,7 @@ class ApplicationTest {
         fun testNonExistingUserLogin() {
             val user = newDummyUser()
             getUserInfo(user)
-            assertThrows(NoSuchElementException::class.java) { myServer.signIn(user.userId + "_qwerty鷗", user.password) }
+            assertThrows(UserNotFoundException::class.java) { myServer.signIn(user.userId + "_qwerty鷗", user.password) }
         }
 
         @Test
@@ -173,7 +175,7 @@ class ApplicationTest {
             val token = getToken(user)
             val gotUserInfo = myServer.checkUserAuthorization(user.userId, token)
             assertEquals(userInfo, gotUserInfo)
-            assertThrows(NoSuchElementException::class.java) { myServer.signOut(user.userId + "_1qwerty鷗", token) }
+            assertThrows(UserNotFoundException::class.java) { myServer.signOut(user.userId + "_1qwerty鷗", token) }
         }
     }
 
@@ -206,14 +208,17 @@ class ApplicationTest {
         fun testNonExistingAnother() {
             val user = newDummyUser()
             val token = getToken(user)
-            assertThrows(NoSuchElementException::class.java) { myServer.usersListById(user.userId + "_qwerty鷗", user.userId, token) }
+            //TODO если ничего не найдется, то будет просто пустой лист, никакого исключения быть не должно
+            //assertThrows(UserNotFoundException::class.java) { myServer.usersListById(user.userId + "_qwerty鷗", user.userId, token) }
+            val checkSize = myServer.usersListById(user.userId + "_qwerty鷗", user.userId, token).size
+            assertEquals(0, checkSize)
         }
 
         @Test
         fun testNonExistingYou() {
             val user = newDummyUser()
             val token = getToken(user)
-            assertThrows(NoSuchElementException::class.java) { myServer.usersListById(user.userId, user.userId + "_qwerty鷗", token) }
+            assertThrows(UserNotFoundException::class.java) { myServer.usersListById(user.userId, user.userId + "_qwerty鷗", token) }
         }
 
         @Test
@@ -257,7 +262,7 @@ class ApplicationTest {
         fun testNonExistingYou() {
             val user = newDummyUser()
             val token = getToken(user)
-            assertThrows(NoSuchElementException::class.java) { myServer.usersListById(user.displayName, user.userId + "_qwerty鷗", token) }
+            assertThrows(UserNotFoundException::class.java) { myServer.usersListById(user.displayName, user.userId + "_qwerty鷗", token) }
         }
 
         @Test
@@ -285,7 +290,7 @@ class ApplicationTest {
         fun testNonExisting() {
             val user = newDummyUser()
             val token = getToken(user)
-            assertThrows(NoSuchElementException::class.java) { myServer.chatsCreate("Tea Party", user.userId + "_qwerty鷗", token) }
+            assertThrows(UserNotFoundException::class.java) { myServer.chatsCreate("Tea Party", user.userId + "_qwerty鷗", token) }
         }
 
         @Test
@@ -689,6 +694,8 @@ class ApplicationTest {
                     assertEquals(1, messages2.size)
                     assertEquals(it.second, messages2[0].text)
 
+                    //delay(1000) // чтобы сообщения не создались в одну секунду
+
                     val newMessage = it.second + " is worse than tea."
                     myServer.chatMessagesCreate(chatId.chatId, newMessage, invUser.userId, getToken(invUser))
 
@@ -699,6 +706,7 @@ class ApplicationTest {
 
                     val messages4 = myServer.chatMessagesList(chatId.chatId, invUser.userId,
                             getToken(invUser), messages3[0].messageId + 1)
+                    val res = MessengerServer.storage.showMessages()
                     assertEquals(1, messages4.size)
                     assertEquals(newMessage, messages4[0].text)
                 }
