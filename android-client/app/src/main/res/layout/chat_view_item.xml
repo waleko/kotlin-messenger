@@ -7,7 +7,7 @@
     android:layout_height="wrap_content">
 
   <ImageView
-          android:id="@+id/profilePictureView"
+          android:id="@+id/messageProfilePicture"
           android:layout_width="50dp"
           android:layout_height="50dp"
           tools:src="@tools:sample/avatars"
@@ -17,36 +17,36 @@
           android:layout_marginTop="8dp" android:contentDescription="@string/profile_picture"/>
 
   <TextView
-      android:id="@+id/displayNameView"
+      android:id="@+id/messageDisplayName"
       android:layout_width="wrap_content"
       android:layout_height="wrap_content"
       tools:text="@tools:sample/full_names"
       android:textSize="20sp"
       android:textColor="@android:color/black"
-      app:layout_constraintTop_toTopOf="@+id/profilePictureView"
-      app:layout_constraintStart_toEndOf="@+id/profilePictureView"
+      app:layout_constraintTop_toTopOf="@+id/messageProfilePicture"
+      app:layout_constraintStart_toEndOf="@+id/messageProfilePicture"
       android:layout_marginStart="8dp"
       android:layout_marginBottom="8dp"
-      app:layout_constraintBottom_toTopOf="@+id/messageTextView" />
+      app:layout_constraintBottom_toTopOf="@+id/messageText" />
 
   <TextView
-      android:id="@+id/messageTextView"
+      android:id="@+id/messageText"
       android:layout_width="285dp"
       android:layout_height="20dp"
       tools:text="@tools:sample/lorem[4:10]"
-      app:layout_constraintBottom_toBottomOf="@+id/profilePictureView"
-      app:layout_constraintStart_toEndOf="@+id/profilePictureView"
+      app:layout_constraintBottom_toBottomOf="@+id/messageProfilePicture"
+      app:layout_constraintStart_toEndOf="@+id/messageProfilePicture"
       android:layout_marginStart="8dp"
       app:layout_constraintEnd_toEndOf="parent"
       android:layout_marginEnd="8dp"
       app:layout_constraintHorizontal_bias="0.050" />
 
   <TextView
-      android:id="@+id/timeView"
+      android:id="@+id/messageTime"
       android:layout_width="wrap_content"
       android:layout_height="wrap_content"
       tools:text="@tools:sample/date/hhmm"
-      app:layout_constraintTop_toTopOf="@+id/profilePictureView"
+      app:layout_constraintTop_toTopOf="@+id/messageProfilePicture"
       app:layout_constraintEnd_toEndOf="parent"
       android:layout_marginEnd="8dp" />
 </android.support.constraint.ConstraintLayout>
